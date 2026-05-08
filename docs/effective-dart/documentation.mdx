@@ -1,8 +1,6 @@
 ---
 # title: "Effective Dart: Documentation"
 title: 高效 Dart 语言指南：文档
-# breadcrumb: Documentation
-breadcrumb: 文档
 # description: Clear, helpful comments and documentation.
 description: 简洁实用的注释以及文档。
 nextpage:
@@ -15,7 +13,6 @@ prevpage:
   title: 代码风格
 ---
 
-<?code-excerpt path-base="misc/lib/effective_dart"?>
 
 It's easy to think your code is obvious today without realizing how much you
 rely on context already in your head. People new to your code, and
@@ -50,8 +47,7 @@ generated documentation.
 
 ### **要** 像句子一样来格式化注释。
 
-<?code-excerpt "docs_good.dart (comments-like-sentences)"?>
-```dart tag=good
+```dart
 // Not if anything comes before it.
 if (_chunks.isNotEmpty) return false;
 ```
@@ -68,16 +64,14 @@ inline stuff, even TODOs. Even if it's a sentence fragment.
 
 ### **不要** 使用块注释作用作解释说明。
 
-<?code-excerpt "docs_good.dart (block-comments)"?>
-```dart tag=good
+```dart
 void greet(String name) {
   // Assume we have a valid name.
   print('Hi, $name!');
 }
 ```
 
-<?code-excerpt "docs_bad.dart (block-comments)"?>
-```dart tag=bad
+```dart
 void greet(String name) {
   /* Assume we have a valid name. */
   print('Hi, $name!');
@@ -102,29 +96,27 @@ and uses the special `///` syntax that `dart doc` looks for.
 文档注释特别有用，应为通过 [`dart doc`][] 解析这些注释可以生成 [漂亮的文档网页][docs]。
 文档注释包括所有出现在声明之前并使用 `///` 语法的注释，这些注释使用使用 dartdoc 检索。
 
-[`dart doc`]: /tools/dart-doc
-[docs]: {{site.dart-api}}
+[`dart doc`]: https://dart.ac.cn/tools/dart-doc
+[docs]: https://api.dart.dev
 
 ### DO use `///` doc comments to document members and types
 
 ### **要** 使用 `///` 文档注释来注释成员和类型。
 
-{% render 'linter-rule-mention.md', rules:'slash_for_doc_comments' %}
+> 相关 lints: `slash_for_doc_comments`
 
-Using a doc comment instead of a regular comment enables
+Using a doc comment instead of a regular comment enables 
 [`dart doc`][] to find it
 and generate documentation for it.
 
 使用文档注释可以让 [`dart doc`][] 来为你生成代码 API 文档。
 
-<?code-excerpt "docs_good.dart (use-doc-comments)"?>
-```dart tag=good
+```dart
 /// The number of characters in this chunk when unsplit.
 int get length => ...
 ```
 
-<?code-excerpt "docs_good.dart (use-doc-comments)" replace="/^\///g"?>
-```dart tag=bad
+```dart
 // The number of characters in this chunk when unsplit.
 int get length => ...
 ```
@@ -149,7 +141,7 @@ up.
 
 ### **推荐** 为公开发布的 API 编写文档注释。
 
-{% render 'linter-rule-mention.md', rules:'public_member_api_docs' %}
+> 相关 lints: `public_member_api_docs`
 
 You don't have to document every single library, top-level variable, type, and
 member, but you should document most of them.
@@ -178,7 +170,7 @@ functionality provided within. Consider including:
   关于库用途的单句摘要。
 
 * Explanations of terminology used throughout the library.
-
+  
   解释库中用到的术语。
 
 * A couple of complete code samples that walk through using the API.
@@ -201,8 +193,7 @@ at the start of the file.
 和任何可能会放置在文件开头的注释之前，
 加入文档注释。
 
-<?code-excerpt "docs_good.dart (library-doc)"?>
-```dart tag=good
+```dart
 /// A really great test library.
 @TestOn('browser')
 library;
@@ -233,16 +224,14 @@ elsewhere for the solution to their problem.
 通常句子片段就足够了。为读者提供足够的上下文来定位自己，
 并决定是否应该继续阅读，或寻找其他解决问题的方法。
 
-<?code-excerpt "docs_good.dart (first-sentence)"?>
-```dart tag=good
+```dart
 /// Deletes the file at [path] from the file system.
 void delete(String path) {
   ...
 }
 ```
 
-<?code-excerpt "docs_bad.dart (first-sentence)"?>
-```dart tag=bad
+```dart
 /// Depending on the state of the file system and the user's permissions,
 /// certain operations may or may not be possible. If there is no file at
 /// [path] or it can't be accessed, this function throws either [IOError]
@@ -254,24 +243,23 @@ void delete(String path) {
 
 ### DO separate the first sentence of a doc comment into its own paragraph
 
-### **要** 让文档注释的第一句从段落中分开。
+### **要** 让文档注释的第一句从段落中分开。 
 
 Add a blank line after the first sentence to split it out into its own
 paragraph. If more than a single sentence of explanation is useful, put the
 rest in later paragraphs.
 
-在第一句之后添加一个空行，将其拆分为自己的段落。
+在第一句之后添加一个空行，将其拆分为自己的段落。 
 如果不止一个解释句子有用，请将其余部分放在后面的段落中。
 
 This helps you write a tight first sentence that summarizes the documentation.
 Also, tools like `dart doc` use the first paragraph as a short summary in places
 like lists of classes and members.
 
-这有助于你编写一个紧凑的第一句话来总结文档。
+这有助于你编写一个紧凑的第一句话来总结文档。 
 此外，像Dartdoc这样的工具使用第一段作为类和类成员列表等地方的简短摘要。
 
-<?code-excerpt "docs_good.dart (first-sentence-a-paragraph)"?>
-```dart tag=good
+```dart
 /// Deletes the file at [path].
 ///
 /// Throws an [IOError] if the file could not be found. Throws a
@@ -281,8 +269,7 @@ void delete(String path) {
 }
 ```
 
-<?code-excerpt "docs_bad.dart (first-sentence-a-paragraph)"?>
-```dart tag=bad
+```dart
 /// Deletes the file at [path]. Throws an [IOError] if the file could not
 /// be found. Throws a [PermissionError] if the file is present but could
 /// not be deleted.
@@ -302,12 +289,11 @@ spelled out in the doc comment. Instead, focus on explaining what the reader
 *doesn't* already know.
 
 阅读类的文档注释的可以清楚地看到类的名称，它实现的接口等等。
-当读取成员的文档时，命名和封装它的类是显而易见的。
-这些都不需要写在文档注释中。
+当读取成员的文档时，命名和封装它的类是显而易见的。 
+这些都不需要写在文档注释中。 
 相反，应该专注于解释读者所*不知道*的内容。
 
-<?code-excerpt "docs_good.dart (redundant)"?>
-```dart tag=good
+```dart
 class RadioButtonWidget extends Widget {
   /// Sets the tooltip to [lines].
   ///
@@ -318,8 +304,7 @@ class RadioButtonWidget extends Widget {
 }
 ```
 
-<?code-excerpt "docs_bad.dart (redundant)"?>
-```dart tag=bad
+```dart
 class RadioButtonWidget extends Widget {
   /// Sets the tooltip for this radio button widget to the list of strings in
   /// [lines].
@@ -335,7 +320,6 @@ then omit the doc comment.
 It's better to say nothing
 than waste a reader's time telling them something they already know.
 
-<a id="prefer-starting-function-or-method-comments-with-third-person-verbs" aria-hidden="true"></a>
 
 ### PREFER starting comments of a function or method with third-person verbs if its main purpose is a side effect
 
@@ -345,8 +329,7 @@ The doc comment should focus on what the code *does*.
 
 注释应该关注于代码 *所实现的* 功能。
 
-<?code-excerpt "docs_good.dart (third-person)"?>
-```dart tag=good
+```dart
 /// Connects to the server and fetches the query results.
 Stream<QueryResult> fetchResults(Query query) => ...
 
@@ -365,8 +348,7 @@ the *result* of that work, not the work itself.
 注释文档应该表述这个属性*是*什么。虽然 getter 函数会做些计算，
 但是也要求这样，调用者关心的是其*结果*而不是如何计算的。
 
-<?code-excerpt "docs_good.dart (noun-phrases-for-non-boolean-var-etc)"?>
-```dart tag=good
+```dart
 /// The current day of the week, where `0` is Sunday.
 int weekday;
 
@@ -380,8 +362,7 @@ The doc comment should clarify the states this variable represents.
 This is true even for getters which may do calculation or other work.
 What the caller cares about is the *result* of that work, not the work itself.
 
-<?code-excerpt "docs_good.dart (noun-phrases-for-boolean-var-etc)"?>
-```dart tag=good
+```dart
 /// Whether the modal is currently displayed to the user.
 bool isVisible;
 
@@ -392,11 +373,10 @@ bool get shouldConfirm => ...
 bool get canResize => ...
 ```
 
-:::note
-This guideline intentionally doesn't include using "Whether or not". In many
-cases, usage of "or not" with "whether" is superfluous and can be omitted,
-especially when used in this context.
-:::
+> 提示
+> This guideline intentionally doesn't include using "Whether or not". In many
+> cases, usage of "or not" with "whether" is superfluous and can be omitted,
+> especially when used in this context.
 
 ### PREFER a noun phrase or non-imperative verb phrase for a function or method if returning a value is its primary purpose
 
@@ -407,8 +387,7 @@ Use a noun-phrase for such non-boolean functions, and
 a phrase starting with "Whether" for such boolean functions,
 just as for a syntactic property or variable.
 
-<?code-excerpt "docs_good.dart (noun-for-func-returning-value)"?>
-```dart tag=good
+```dart
 /// The [index]th element of this iterable in iteration order.
 E elementAt(int index);
 
@@ -416,17 +395,16 @@ E elementAt(int index);
 bool contains(Object? element);
 ```
 
-:::note
-This guideline should be applied based on whether the declaration is
-conceptually seen as a property.
-
-Sometimes a method has no side effects, and might
-conceptually be seen as a property, but is still
-simpler to name with a verb phrase like `list.take()`.
-Then a noun phrase should still be used to document it.
-_For example `Iterable.take` can be described as
-"The first \[count\] elements of ..."._
-:::
+> 提示
+> This guideline should be applied based on whether the declaration is
+> conceptually seen as a property.
+>
+> Sometimes a method has no side effects, and might
+> conceptually be seen as a property, but is still
+> simpler to name with a verb phrase like `list.take()`.
+> Then a noun phrase should still be used to document it.
+> _For example `Iterable.take` can be described as
+> "The first \[count\] elements of ..."._
 
 [parameterized_property_name]: design#prefer-a-noun-phrase-or-non-imperative-verb-phrase-for-a-function-or-method-if-returning-a-value-is-its-primary-purpose
 
@@ -443,8 +421,7 @@ and if both the getter and the setter have doc comments, then
 `dart doc` 命令会将 getter 和 setter 作为同一个属性进行处理，
 而如果它们都包含文档注释，`dart docs` 命令会将 setter 的文档忽略。
 
-<?code-excerpt "docs_good.dart (getter-and-setter)"?>
-```dart tag=good
+```dart
 /// The pH level of the water in the pool.
 ///
 /// Ranges from 0-14, representing acidic to basic, with 7 being neutral.
@@ -452,8 +429,7 @@ int get phLevel => ...
 set phLevel(int level) => ...
 ```
 
-<?code-excerpt "docs_bad.dart (getter-and-setter)"?>
-```dart tag=bad
+```dart
 /// The depth of the water in the pool, in meters.
 int get waterDepth => ...
 
@@ -479,8 +455,7 @@ The documentation should describe an *instance* of the type.
 
 该文档注释应当描述该类型的 *实例*。
 
-<?code-excerpt "docs_good.dart (noun-phrases-for-type-or-lib)"?>
-```dart tag=good
+```dart
 /// A chunk of non-breaking output text terminated by a hard or soft newline.
 ///
 /// ...
@@ -493,8 +468,7 @@ class Chunk {
 
 ### **考虑** 在文档注释中添加示例代码。
 
-<?code-excerpt "docs_good.dart (code-sample)"?>
-````dart tag=good
+````dart
 /// The lesser of two numbers.
 ///
 /// ```dart
@@ -513,7 +487,7 @@ makes an API easier to learn.
 
 ### **要** 使用方括号在文档注释中引用作用域内的标识符
 
-{% render 'linter-rule-mention.md', rules:'comment_references' %}
+> 相关 lints: `comment_references`
 
 If you surround things like variable, method, or type names in square brackets,
 then `dart doc` looks up the name and links to the relevant API docs.
@@ -526,8 +500,7 @@ where these comment references can be helpful:
 括号是可选的，但是当你在引用一个方法或者构造函数时，可以让注释更清晰。
 下面的文档注释说明了这些注释引用可能有帮助的几种情况：
 
-<?code-excerpt "docs_good.dart (identifiers)"?>
-```dart tag=good
+```dart
 /// Throws a [StateError] if ...
 ///
 /// Similar to [anotherMethod()], but ...
@@ -538,8 +511,7 @@ separated by a dot:
 
 要链接到特定类的成员，请使用以点号分割的类名和成员名：
 
-<?code-excerpt "docs_good.dart (member)"?>
-```dart tag=good
+```dart
 /// Similar to [Duration.inDays], but handles fractional days.
 ```
 
@@ -549,8 +521,7 @@ constructor, use `.new` after the class name:
 点语法也可用于引用命名构造函数。
 对于未命名的构造函数，在类名后面加上 `.new` 来使用默认构造：
 
-<?code-excerpt "docs_good.dart (ctor)"?>
-```dart tag=good
+```dart
 /// To create a point, call [Point.new] or use [Point.polar] to ...
 ```
 
@@ -558,7 +529,7 @@ To learn more about the references that
 the analyzer and `dart doc` support in doc comments,
 check out [Documentation comment references][].
 
-[Documentation comment references]: /tools/doc-comments/references
+[Documentation comment references]: https://dart.ac.cn/tools/doc-comments/references
 
 ### DO use prose to explain parameters, return values, and exceptions
 
@@ -569,8 +540,7 @@ and returns of a method are.
 
 其他语言使用各种标签和额外的注释来描述参数和返回值。
 
-<?code-excerpt "docs_bad.dart (no-annotations)"?>
-```dart tag=bad
+```dart
 /// Defines a flag with the given name and abbreviation.
 ///
 /// @param name The name of the flag.
@@ -597,8 +567,7 @@ precise error which will be thrown.
 对于错误 (Errors)，可以采用与异常 (exceptions) 相同的文档方式，
 也可以仅将其作为必须满足的条件进行说明，而无需具体记录将会抛出的精确错误类型。
 
-<?code-excerpt "docs_good.dart (no-annotations)"?>
-```dart tag=good
+```dart
 /// Defines a flag with the given [name] and [abbreviation].
 ///
 /// The [name] and [abbreviation] strings must not be empty.
@@ -614,15 +583,13 @@ Flag addFlag(String name, String abbreviation) => ...
 
 ### **要** 把注释文档放到注解之前。
 
-<?code-excerpt "docs_good.dart (doc-before-meta)"?>
-```dart tag=good
+```dart
 /// A button that can be flipped on and off.
 @Component(selector: 'toggle')
 class ToggleComponent {}
 ```
 
-<?code-excerpt "docs_bad.dart (doc-before-meta)" replace="/\n\n/\n/g"?>
-```dart tag=bad
+```dart
 @Component(selector: 'toggle')
 /// A button that can be flipped on and off.
 class ToggleComponent {}
@@ -637,7 +604,7 @@ You are allowed to use most [markdown][] formatting in your doc comments and
 并且 dartdoc 会根据 [markdown package.][] 进行解析。
 
 [markdown]: https://daringfireball.net/projects/markdown/
-[markdown package.]: {{site.pub-pkg}}/markdown
+[markdown package.]: https://pub.dev/packages/markdown
 
 There are tons of guides out there already to introduce you to Markdown. Its
 universal popularity is why we chose it. Here's just a quick example to give you
@@ -645,7 +612,6 @@ a flavor of what's supported:
 
 有很多指南已经向你介绍Markdown。 它普遍受欢迎是我们选择它的原因。 这里只是一个简单的例子，让你了解所支持的内容：
 
-<?code-excerpt "docs_good.dart (markdown)"?>
 ````dart
 /// This is a paragraph of regular text.
 ///
@@ -743,7 +709,7 @@ language, and is consistent with using backticks for inline code.
 而且能够指出代码的语言类型，
 内联代码同样可以使用反引号标注。
 
-```dart tag=good
+```dart
 /// You can use [CodeBlockExample] like this:
 ///
 /// ```dart
@@ -752,7 +718,7 @@ language, and is consistent with using backticks for inline code.
 /// ```
 ```
 
-```dart tag=bad
+```dart
 /// You can use [CodeBlockExample] like this:
 ///
 ///     var example = CodeBlockExample();
@@ -806,7 +772,6 @@ Prefer having some qualifier after "this", a sole "this" can be ambiguous too.
 使用 "the" 可能会导致混淆。
 最好在 "this" 后面加上一些限定词，单独的 "this" 也会产生歧义。
 
-<?code-excerpt "docs_good.dart (this)"?>
 ```dart
 class Box {
   /// The value this box wraps.

@@ -1,21 +1,41 @@
 {
-  "name": "My Docs",
-  "description": "My documentation site",
+  "$schema": "https://docs.page/schema.json",
+  "name": "RingConn Dart 代码规范",
+  "description": "基于 docs.page 维护的项目 Dart 代码规范，第一版以官方 Effective Dart 中文内容为示例。",
   "sidebar": [
-  {
-    "group": "Getting Started",
-    "pages": [
-      {
-        "title": "Getting to know docs.page",
-        "href": "/",
-        "icon": "rocket"
-      },
-      {
-        "title": "Next Steps",
-        "href": "/next-steps",
-        "icon": "arrow-right"
-      }
-    ]
-  }
-]
+    {
+      "group": "开始",
+      "pages": [
+        {
+          "title": "概览",
+          "href": "/"
+        }
+      ]
+    },
+    {
+      "group": "Effective Dart 示例",
+      "pages": [
+        {
+          "title": "概览",
+          "href": "/effective-dart"
+        },
+        {
+          "title": "代码风格",
+          "href": "/effective-dart/style"
+        },
+        {
+          "title": "文档",
+          "href": "/effective-dart/documentation"
+        },
+        {
+          "title": "用法示例",
+          "href": "/effective-dart/usage"
+        },
+        {
+          "title": "API 设计",
+          "href": "/effective-dart/design"
+        }
+      ]
+    }
+  ]
 }
