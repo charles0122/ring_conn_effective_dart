@@ -27,6 +27,42 @@ DART_CN_PREFIXES = (
     "/null-safety/",
 )
 
+GUIDELINE_STYLES = {
+    "DO": {
+        "bg": "rgba(34, 197, 94, 0.16)",
+        "text": "#15803d",
+        "border": "rgba(21, 128, 61, 0.24)",
+    },
+    "DON'T": {
+        "bg": "rgba(239, 68, 68, 0.16)",
+        "text": "#b91c1c",
+        "border": "rgba(185, 28, 28, 0.24)",
+    },
+    "PREFER": {
+        "bg": "rgba(59, 130, 246, 0.16)",
+        "text": "#1d4ed8",
+        "border": "rgba(29, 78, 216, 0.24)",
+    },
+    "AVOID": {
+        "bg": "rgba(245, 158, 11, 0.18)",
+        "text": "#b45309",
+        "border": "rgba(180, 83, 9, 0.24)",
+    },
+    "CONSIDER": {
+        "bg": "rgba(20, 184, 166, 0.16)",
+        "text": "#0f766e",
+        "border": "rgba(15, 118, 110, 0.24)",
+    },
+}
+
+CHINESE_GUIDELINE_MAP = {
+    "要": "DO",
+    "不要": "DON'T",
+    "推荐": "PREFER",
+    "避免": "AVOID",
+    "考虑": "CONSIDER",
+}
+
 
 def fetch_page(name: str) -> str:
     url = f"{BASE_URL}/{name}.md"
@@ -104,6 +140,55 @@ def normalize_code_fence(line: str) -> str:
 def format_linter_rules(rule_list: str) -> str:
     rules = [f"`{rule.strip()}`" for rule in rule_list.split(",") if rule.strip()]
     return f"> 相关 lints: {', '.join(rules)}\n"
+
+
+def build_guideline_badge(label: str, tone: str) -> str:
+    palette = GUIDELINE_STYLES[tone]
+    return (
+        '<span style={{'
+        'display: "inline-block", '
+        'padding: "0.18rem 0.58rem", '
+        'marginRight: "0.45rem", '
+        'borderRadius: "999px", '
+        'border: "1px solid '
+        + palette["border"]
+        + '", '
+        'background: "'
+        + palette["bg"]
+        + '", '
+        'color: "'
+        + palette["text"]
+        + '", '
+        'fontWeight: 800, '
+        'fontSize: "0.78em", '
+        'letterSpacing: "0.04em", '
+        'lineHeight: 1.2, '
+        'verticalAlign: "middle"'
+        '}}>'
+        + label
+        + "</span>"
+    )
+
+
+def style_guideline_heading(line: str) -> str:
+    english_match = re.match(r"^(### )(?P<label>DO|DON'T|PREFER|AVOID|CONSIDER)\b(?P<rest>.*)$", line)
+    if english_match:
+        label = english_match.group("label")
+        rest = english_match.group("rest")
+        badge = build_guideline_badge(label, label)
+        return f"{english_match.group(1)}{badge} {rest.lstrip()}\n"
+
+    chinese_match = re.match(
+        r"^(### )\*\*(?P<label>要|不要|推荐|避免|考虑)\*\*(?P<rest>.*)$",
+        line,
+    )
+    if chinese_match:
+        label = chinese_match.group("label")
+        rest = chinese_match.group("rest")
+        badge = build_guideline_badge(label, CHINESE_GUIDELINE_MAP[label])
+        return f"{chinese_match.group(1)}{badge} {rest.lstrip()}\n"
+
+    return line
 
 
 def transform_markdown(content: str) -> str:
@@ -191,6 +276,7 @@ def transform_markdown(content: str) -> str:
 
         line = replace_root_links(line)
         line = replace_inline_type_tags(line)
+        line = style_guideline_heading(line)
         output.append(line)
 
     return "".join(output)

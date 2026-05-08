@@ -33,9 +33,9 @@ to cover `import` and `export` directives. The guidelines apply equally to both.
 为了让准则简洁，这里使用“import”来同时代表 `import` 和 `export` 。
 准则同时适用于这两者。
 
-### DO use strings in `part of` directives
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> use strings in `part of` directives
 
-### **要** 在 `part of` 中使用字符串
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 在 `part of` 中使用字符串
 
 > 相关 lints: `use_string_in_part_of_directives`
 
@@ -86,9 +86,9 @@ Not the library name:
 part of my_library;
 ```
 
-### DON'T import libraries that are inside the `src` directory of another package
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> import libraries that are inside the `src` directory of another package
 
-### **不要** 导入 package 中 `src` 目录下的库
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 导入 package 中 `src` 目录下的库
 
 > 相关 lints: `implementation_imports`
 
@@ -110,7 +110,7 @@ theoretically non-breaking point release of that package could break your code.
 这意味着，你如果导入了其中的私有库，
 按理论来讲，一个不破坏 package 的次版本就会影响到你的代码。
 
-### DON'T allow an import path to reach into or out of `lib`
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> allow an import path to reach into or out of `lib`
 
 > 相关 lints: `avoid_relative_lib_imports`
 
@@ -161,7 +161,7 @@ A package should never reach *out* of its `lib` directory and
 import libraries from other places in the package.
 
 
-### PREFER relative import paths
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.16)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>PREFER</span> relative import paths
 
 > 相关 lints: `prefer_relative_imports`
 
@@ -208,7 +208,7 @@ import 'test_utils.dart'; // Relative within 'test' is fine.
 ## Null
 
 
-### DON'T explicitly initialize variables to `null`
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> explicitly initialize variables to `null`
 
 > 相关 lints: `avoid_init_to_null`
 
@@ -247,7 +247,7 @@ Item? bestDeal(List<Item> cart) {
 ```
 
 
-### DON'T use an explicit default value of `null`
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> use an explicit default value of `null`
 
 > 相关 lints: `avoid_init_to_null`
 
@@ -266,7 +266,7 @@ void error([String? message = null]) {
 }
 ```
 
-### DON'T use `true` or `false` in equality operations
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> use `true` or `false` in equality operations
 
 Using the equality operator to evaluate a *non-nullable* boolean expression 
 against a boolean literal is redundant. 
@@ -345,7 +345,7 @@ doesn't promote the variable to a non-nullable type.
 If you want the variable to be promoted inside the body of the `if` statement,
 it's better to use an explicit `!= null` check instead of `??`. 
 
-### AVOID `late` variables if you need to check whether they are initialized
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>AVOID</span> `late` variables if you need to check whether they are initialized
 
 Dart offers no way to tell if a `late` variable
 has been initialized or assigned to.
@@ -368,7 +368,7 @@ Of course, if `null` is a valid initialized value for the variable,
 then it probably does make sense to have a separate boolean field.
 
 
-### CONSIDER type promotion or null-check patterns for using nullable types
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(15, 118, 110, 0.24)", background: "rgba(20, 184, 166, 0.16)", color: "#0f766e", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>CONSIDER</span> type promotion or null-check patterns for using nullable types
 
 Checking that a nullable variable is not equal to `null` promotes the variable
 to a non-nullable type. That lets you access members on the variable and pass it
@@ -469,9 +469,9 @@ Here are some best practices to keep in mind when composing strings in Dart.
 
 下面是一些需要记住的，关于在 Dart 中使用字符串的最佳实践。
 
-### DO use adjacent strings to concatenate string literals
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> use adjacent strings to concatenate string literals
 
-### **要** 使用相邻字符串的方式连接字面量字符串
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 使用相邻字符串的方式连接字面量字符串
 
 > 相关 lints: `prefer_adjacent_string_concatenation`
 
@@ -499,9 +499,9 @@ raiseAlarm(
 );
 ```
 
-### PREFER using interpolation to compose strings and values
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.16)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>PREFER</span> using interpolation to compose strings and values
 
-### **推荐** 使用插值的形式来组合字符串和值
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.16)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>推荐</span> 使用插值的形式来组合字符串和值
 
 > 相关 lints: `prefer_interpolation_to_compose_strings`
 
@@ -523,9 +523,9 @@ it's almost always cleaner and shorter to use interpolation:
 Note that this guideline applies to combining *multiple* literals and values.
 It's fine to use `.toString()` when converting only a single object to a string.
 
-### AVOID using curly braces in interpolation when not needed
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>AVOID</span> using curly braces in interpolation when not needed
 
-### **避免** 在字符串插值中使用不必要的大括号
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>避免</span> 在字符串插值中使用不必要的大括号
 
 > 相关 lints: `unnecessary_brace_in_string_interps`
 
@@ -552,9 +552,9 @@ The following best practices apply to collections.
 Dart 集合中原生支持了四种类型：list， map， queue， 和 set。
 下面是应用于集合的最佳实践。
 
-### DO use collection literals when possible
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> use collection literals when possible
 
-### **要** 尽可能的使用集合字面量
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 尽可能的使用集合字面量
 
 > 相关 lints: `prefer_collection_literals`
 
@@ -619,9 +619,9 @@ arguments.addAll(
 `List.from()`、 `Map.fromIterable()` 都有其使用场景。 
 如果需要一个固定长度的结合，使用 ``List()`` 来创建一个固定长度的 list 也是合理的。
 
-### DON'T use `.length` to see if a collection is empty
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> use `.length` to see if a collection is empty
 
-### **不要** 使用 `.length` 来判断一个集合是否为空
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 使用 `.length` 来判断一个集合是否为空
 
 > 相关 lints: `prefer_is_empty`, `prefer_is_not_empty`
 
@@ -651,9 +651,9 @@ if (!words.isEmpty) return words.join(' ');
 ```
 
 
-### AVOID using `Iterable.forEach()` with a function literal
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>AVOID</span> using `Iterable.forEach()` with a function literal
 
-### **避免** 在 `Iterable.forEach()` 中使用字面量函数
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>避免</span> 在 `Iterable.forEach()` 中使用字面量函数
 
 > 相关 lints: `avoid_function_literals_in_foreach_calls`
 
@@ -692,9 +692,9 @@ this guideline doesn't apply.
 
 你可以调用 `Map.forEach()`。Map 是不可迭代的，所以该准则对它无效。
 
-### DON'T use `List.from()` unless you intend to change the type of the result
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> use `List.from()` unless you intend to change the type of the result
 
-### **不要** 使用 `List.from()` 除非想修改结果的类型
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 使用 `List.from()` 除非想修改结果的类型
 
 Given an Iterable, there are two obvious ways to produce a new List that
 contains the same elements:
@@ -746,9 +746,9 @@ you don't care about the type, then use `toList()`.
 或者并不在乎类型，那么请使用 `toList()`。
 
 
-### DO use `whereType()` to filter a collection by type
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> use `whereType()` to filter a collection by type
 
-### **要** 使用 `whereType()` 按类型过滤集合
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 使用 `whereType()` 按类型过滤集合
 
 > 相关 lints: `prefer_iterable_whereType`
 
@@ -803,9 +803,9 @@ and has no unnecessary levels of wrapping.
 并且没有不必要的层级包装。
 
 
-### DON'T use `cast()` when a nearby operation will do
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> use `cast()` when a nearby operation will do
 
-### **不要** 使用 `cast()`，如果有更合适的方法
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 使用 `cast()`，如果有更合适的方法
 
 Often when you're dealing with an iterable or stream, you perform several
 transformations on it. At the end, you want to produce an object with a certain
@@ -857,9 +857,9 @@ var reciprocals = stuff.map((n) => n * 2).cast<double>();
 ```
 
 
-### AVOID using `cast()`
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>AVOID</span> using `cast()`
 
-### **避免** 使用 `cast()` 
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>避免</span> 使用 `cast()` 
 
 This is the softer generalization of the previous rule. Sometimes there is no
 nearby operation you can use to fix the type of some object. Even then, when
@@ -984,9 +984,9 @@ involving functions.
 在 Dart 中，就连函数也是对象。以下是一些涉及函数的最佳实践。
 
 
-### DO use a function declaration to bind a function to a name
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> use a function declaration to bind a function to a name
 
-### **要** 使用函数声明的方式为函数绑定名称
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 使用函数声明的方式为函数绑定名称
 
 > 相关 lints: `prefer_function_declarations_over_variables`
 
@@ -1022,9 +1022,9 @@ void main() {
 }
 ```
 
-### DON'T create a lambda when a tear-off will do
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> create a lambda when a tear-off will do
 
-### **不要** 使用 lambda 表达式来替代 tear-off
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 使用 lambda 表达式来替代 tear-off
 
 > 相关 lints: `unnecessary_lambdas`
 
@@ -1086,7 +1086,7 @@ var buffers = charCodes.map((code) => StringBuffer(code));
 
 The following best practices describe how to best use variables in Dart.
 
-### DO follow a consistent rule for `var` and `final` on local variables
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> follow a consistent rule for `var` and `final` on local variables
 
 Most local variables shouldn't have type annotations and should be declared
 using just `var` or `final`. There are two rules in wide use for when to use one
@@ -1104,9 +1104,9 @@ your code. That way when a reader sees `var`, they know whether it means that
 the variable is assigned later in the function.
 
 
-### AVOID storing what you can calculate
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>AVOID</span> storing what you can calculate
 
-### **避免** 保存可计算的结果
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>避免</span> 保存可计算的结果
 
 When designing a class, you often want to expose multiple views into the same
 underlying state. Often you see code that calculates all of those views in the
@@ -1224,9 +1224,9 @@ variables). The following best practices apply to an object's members.
 在 Dart 中，对象成员可以是函数（方法）或数据（实例变量）。
 下面是关于对象成员的最佳实践。
 
-### DON'T wrap a field in a getter and setter unnecessarily
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> wrap a field in a getter and setter unnecessarily
 
-### **不要** 为字段创建不必要的 getter 和 setter 方法
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 为字段创建不必要的 getter 和 setter 方法
 
 > 相关 lints: `unnecessary_getters_setters`
 
@@ -1267,9 +1267,9 @@ class Box {
 ```
 
 
-### PREFER using a `final` field to make a read-only property
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.16)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>PREFER</span> using a `final` field to make a read-only property
 
-### **推荐** 使用 `final` 关键字来创建只读属性
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.16)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>推荐</span> 使用 `final` 关键字来创建只读属性
 
 If you have a field that outside code should be able to see but not assign to, a
 simple solution that works in many cases is to simply mark it `final`.
@@ -1299,9 +1299,9 @@ don't reach for that until you need to.
 但是，如非必要，请不要使用这种模式。
 
 
-### CONSIDER using `=>` for simple members
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(15, 118, 110, 0.24)", background: "rgba(20, 184, 166, 0.16)", color: "#0f766e", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>CONSIDER</span> using `=>` for simple members
 
-### **考虑** 对简单成员使用 `=>` 
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(15, 118, 110, 0.24)", background: "rgba(20, 184, 166, 0.16)", color: "#0f766e", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>考虑</span> 对简单成员使用 `=>` 
 
 > 相关 lints: `prefer_expression_function_bodies`
 
@@ -1360,8 +1360,9 @@ set x(num value) => center = Point(value, center.y);
 ```
 
 
-### DON'T use `this.` except to redirect to a named constructor or to avoid shadowing
-### **不要** 使用 `this.`，在重定向命名函数和避免冲突的情况下除外
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> use `this.` except to redirect to a named constructor or to avoid shadowing
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 使用 `this.`，在重定向命名函数和避免冲突的情况下除外
 
 > 相关 lints: `unnecessary_this`
 
@@ -1457,9 +1458,9 @@ relatively rare thanks to initializing formals and super initializers.
 幸运的是，由于初始化规则的特殊性，上面的代码很少见到。
 
 
-### DO initialize fields at their declaration when possible
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> initialize fields at their declaration when possible
 
-### **要** 尽可能的在定义变量的时候初始化变量值
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 尽可能的在定义变量的时候初始化变量值
 
 If a field doesn't depend on any constructor parameters, it can and should be
 initialized at its declaration. It takes less code and avoids duplication when
@@ -1504,9 +1505,9 @@ The following best practices apply to declaring constructors for a class.
 
 下面对于类的构造函数的最佳实践。
 
-### DO use initializing formals when possible
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> use initializing formals when possible
 
-### **要** 尽可能的使用初始化形式
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 尽可能的使用初始化形式
 
 > 相关 lints: `prefer_initializing_formals`
 
@@ -1539,7 +1540,7 @@ named parameter whose name doesn't match the name of the field you are
 initializing. But when you *can* use initializing formals, you *should*.
 
 
-### DON'T use `late` when a constructor initializer list will do
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> use `late` when a constructor initializer list will do
 
 Dart requires you to initialize non-nullable fields before they can be read.
 Since fields can be read inside the constructor body, 
@@ -1583,9 +1584,9 @@ that's better than making the field `late` and losing some static safety and
 performance.
 
 
-### DO use `;` instead of `{}` for empty constructor bodies
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> use `;` instead of `{}` for empty constructor bodies
 
-### **要** 用 `;` 来替代空的构造函数体 `{}`
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 用 `;` 来替代空的构造函数体 `{}`
 
 > 相关 lints: `empty_constructor_bodies`
 
@@ -1609,9 +1610,9 @@ class Point {
 }
 ```
 
-### DON'T use `new`
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> use `new`
 
-### **不要** 使用 `new`
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 使用 `new`
 
 > 相关 lints: `unnecessary_new`
 
@@ -1652,9 +1653,9 @@ Widget build(BuildContext context) {
 ```
 
 
-### DON'T use `const` redundantly
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> use `const` redundantly
 
-### **不要** 冗余地使用 `const` 
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 冗余地使用 `const` 
 
 > 相关 lints: `unnecessary_const`
 
@@ -1724,9 +1725,9 @@ best practices apply to catching and throwing exceptions.
 Dart 使用异常来表示程序执行错误。
 下面是关于如何捕获和抛出异常的最佳实践。
 
-### AVOID catches without `on` clauses
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>AVOID</span> catches without `on` clauses
 
-### **避免** 使用没有 `on` 语句的 catch
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>避免</span> 使用没有 `on` 语句的 catch
 
 > 相关 lints: `avoid_catches_without_on_clauses`
 
@@ -1762,9 +1763,9 @@ than to catch all types. Exception is the base class for all *runtime* errors
 and excludes errors that indicate *programmatic* bugs in the code.
 
 
-### DON'T discard errors from catches without `on` clauses
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> discard errors from catches without `on` clauses
 
-### **不要** 丢弃没有使用 `on` 语句捕获的异常
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 丢弃没有使用 `on` 语句捕获的异常
 
 If you really do feel you need to catch *everything* that can be thrown from a
 region of code, *do something* with what you catch. Log it, display it to the
@@ -1775,9 +1776,9 @@ user or rethrow it, but do not silently discard it.
 或者重新抛出 (rethrow) 异常信息，记得不要默默的丢弃该异常信息。
 
 
-### DO throw objects that implement `Error` only for programmatic errors
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> throw objects that implement `Error` only for programmatic errors
 
-### **要** 只在代表编程错误的情况下才抛出实现了 `Error` 的异常
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 只在代表编程错误的情况下才抛出实现了 `Error` 的异常
 
 The [Error][] class is the base class for *programmatic* errors. When an object
 of that type or one of its subinterfaces like [ArgumentError][] is thrown, it
@@ -1797,9 +1798,9 @@ one of the core Exception classes or some other type.
 应该抛出核心定义的 Exception 类或者其他类型。
 
 
-### DON'T explicitly catch `Error` or types that implement it
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> explicitly catch `Error` or types that implement it
 
-### **不要** 显示的捕获 `Error` 或者其子类
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 显示的捕获 `Error` 或者其子类
 
 > 相关 lints: `avoid_catching_errors`
 
@@ -1818,9 +1819,9 @@ and fix the code that is causing it to be thrown in the first place.
 不要在这里使用错误处理代码，而是需要到导致该错误出现的地方修复你的代码。
 
 
-### DO use `rethrow` to rethrow a caught exception
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> use `rethrow` to rethrow a caught exception
 
-### **要** 使用 `rethrow` 来重新抛出捕获的异常
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 使用 `rethrow` 来重新抛出捕获的异常
 
 > 相关 lints: `use_rethrow_when_possible`
 
@@ -1862,9 +1863,9 @@ The following best practices apply to asynchronous coding.
 Dart 具有几个语言特性来支持异步编程。
 下面是针对异步编程的最佳实践。
 
-### PREFER async/await over using raw futures
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.16)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>PREFER</span> async/await over using raw futures
 
-### **推荐** 使用 async/await 而不是直接使用底层的特性
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.16)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>推荐</span> 使用 async/await 而不是直接使用底层的特性
 
 Asynchronous code is notoriously hard to read and debug, even when using a nice
 abstraction like futures. The `async`/`await` syntax improves readability and
@@ -1907,9 +1908,9 @@ Future<int> countActivePlayers(String teamName) {
 }
 ```
 
-### DON'T use `async` when it has no useful effect
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DON'T</span> use `async` when it has no useful effect
 
-### **不要** 在没有有用效果的情况下使用 `async` 
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.16)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>不要</span> 在没有有用效果的情况下使用 `async` 
 
 It's easy to get in the habit of using `async` on any function that does
 anything related to asynchrony. But in some cases, it's extraneous. If you can
@@ -1960,17 +1961,17 @@ Future<void> asyncError() async {
 Future<String> asyncValue() async => 'value';
 ```
 
-### CONSIDER using higher-order methods to transform a stream
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(15, 118, 110, 0.24)", background: "rgba(20, 184, 166, 0.16)", color: "#0f766e", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>CONSIDER</span> using higher-order methods to transform a stream
 
-### **考虑** 使用高阶函数来转换事件流 (stream) 
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(15, 118, 110, 0.24)", background: "rgba(20, 184, 166, 0.16)", color: "#0f766e", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>考虑</span> 使用高阶函数来转换事件流 (stream) 
 
 This parallels the above suggestion on iterables. Streams support many of the
 same methods and also handle things like transmitting errors, closing, etc.
 correctly.
 
-### AVOID using Completer directly
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>AVOID</span> using Completer directly
 
-### **避免** 直接使用 Completer
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>避免</span> 直接使用 Completer
 
 Many people new to asynchronous programming want to write code that produces a
 future. The constructors in Future don't seem to fit their need so they
@@ -2020,9 +2021,9 @@ Future<bool> fileContainsBear(String path) async {
 ```
 
 
-### DO test for `Future<T>` when disambiguating a `FutureOr<T>` whose type argument could be `Object`
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>DO</span> test for `Future<T>` when disambiguating a `FutureOr<T>` whose type argument could be `Object`
 
-### **要** 使用 `Future<T>` 对 `FutureOr<T>` 参数进行测试，以消除参数可能是 `Object` 类型的歧义
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.16)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>要</span> 使用 `Future<T>` 对 `FutureOr<T>` 参数进行测试，以消除参数可能是 `Object` 类型的歧义
 
 Before you can do anything useful with a `FutureOr<T>`, you typically need to do
 an `is` check to see if you have a `Future<T>` or a bare `T`. If the type
