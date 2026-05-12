@@ -1,25 +1,31 @@
 ---
 title: RingConn Dart 代码规范
-description: 使用 docs.page 承载项目内的 Dart 代码规范，第一版以官方 Effective Dart 中文内容为示例。
+description: 由团队维护的 Dart 代码规范站点，官方 Effective Dart 仅作为参考来源。
 ---
 
 # RingConn Dart 代码规范
 
-这里用于沉淀我们项目内部的 Dart 代码规范。
+这里用于沉淀我们团队自己维护的 Dart 代码规范。
 
-第一版先接入官方 Effective Dart 的中文内容，作为规范站点的基础骨架和示例内容。后续我们可以在这个仓库里逐步补充：
+文档分成两层：
 
-- 适用于我们项目的补充约定
-- 和 Flutter / 工程结构相关的实践
-- 与 lint、review、命名和目录组织有关的内部规则
+- [团队规范](/team-guidelines)：团队当前采纳并要求执行的规则，是唯一权威版本
+- [官方参考](/effective-dart)：同步自 Effective Dart 的中文内容，仅用于查阅和对照
 
-## 当前内容
+这意味着：
 
-- [Effective Dart 概览](/effective-dart)
-- [代码风格](/effective-dart/style)
-- [文档](/effective-dart/documentation)
-- [用法示例](/effective-dart/usage)
-- [API 设计](/effective-dart/design)
+- 官方 `DO / DON'T / PREFER / AVOID / CONSIDER` 不自动等于团队已经采纳
+- 团队会结合现有工程、review 成本和可落地性，决定哪些规则进入采纳清单
+- 后续新增或调整规则时，以团队规范分组中的内容为准
+
+## 当前入口
+
+- [团队规范概览](/team-guidelines)
+- [团队代码风格](/team-guidelines/style)
+- [团队文档规范](/team-guidelines/documentation)
+- [团队用法规范](/team-guidelines/usage)
+- [团队 API 设计规范](/team-guidelines/design)
+- [官方参考：Effective Dart](/effective-dart)
 
 ## 预览方式
 
@@ -30,13 +36,13 @@ description: 使用 docs.page 承载项目内的 Dart 代码规范，第一版�
 3. 保存 `docs/` 或 `docs.json` 中的修改
 4. 在浏览器中实时查看效果
 
-## 关于示例来源
+## 维护方式
 
-当前示例内容来自 Dart 中文社区维护的 Effective Dart 中文文档：
+- 团队规范页面由团队手工维护，不会被同步脚本覆盖
+- 官方参考页面来自 Dart 中文社区维护的 Effective Dart 中文文档
+- 团队是否采纳某条官方建议，以团队规范页面里的规则条目为准
+
+当前官方参考来源：
 [cfug/dart.cn/effective-dart](https://github.com/cfug/dart.cn/tree/main/src/content/effective-dart)
 
-为了适配 `docs.page` 预览，这里对上游内容做了轻量清洗，比如：
-
-- 移除官网专用的模板标签
-- 替换成普通 Markdown/MDX 可渲染内容
-- 修正部分站内链接到 Dart 中文官网
+同步时会做轻量清洗，用于适配 `docs.page` 渲染。

@@ -1,0 +1,44 @@
+---
+title: 团队规范：文档
+description: 团队当前采纳的 Dart 文档与注释规范。
+prevpage:
+  url: /team-guidelines/style
+  title: 代码风格
+nextpage:
+  url: /team-guidelines/usage
+  title: 用法
+---
+
+# 团队规范：文档
+
+这里关注代码注释、文档注释以及对公开 API 的说明方式。
+
+### <span style="display:inline-block;padding:0.18rem 0.58rem;margin-right:0.45rem;border-radius:999px;border:1px solid rgba(29, 78, 216, 0.24);background:rgba(59, 130, 246, 0.16);color:#1d4ed8;font-weight:800;font-size:0.78em;letter-spacing:0.04em;line-height:1.2;vertical-align:middle;">推荐</span> 为公开 API 编写文档注释
+
+规则描述：面向模块外暴露的类、方法、扩展和重要常量，优先补充文档注释，说明用途、前置条件和关键行为。
+
+采纳理由：公开 API 是多人协作和长期维护的边界，缺乏文档时，调用方只能依赖命名猜测行为，成本会持续累积。
+
+官方来源：[Effective Dart / PREFER writing doc comments for public APIs](/effective-dart/documentation#prefer-writing-doc-comments-for-public-apis)
+
+相关 lints：`public_member_api_docs`
+
+### <span style="display:inline-block;padding:0.18rem 0.58rem;margin-right:0.45rem;border-radius:999px;border:1px solid rgba(21, 128, 61, 0.24);background:rgba(34, 197, 94, 0.16);color:#15803d;font-weight:800;font-size:0.78em;letter-spacing:0.04em;line-height:1.2;vertical-align:middle;">必须</span> 文档注释开头先给出单句摘要
+
+规则描述：文档注释的第一句应先概括“这个声明是做什么的”，再补充细节说明。
+
+采纳理由：单句摘要最适合列表浏览和 IDE 悬浮提示，也能迫使我们先写清楚最重要的行为边界。
+
+官方来源：[Effective Dart / DO start doc comments with a single-sentence summary](/effective-dart/documentation#do-start-doc-comments-with-a-single-sentence-summary)
+
+相关 lints：无，主要依赖 review 执行。
+
+### <span style="display:inline-block;padding:0.18rem 0.58rem;margin-right:0.45rem;border-radius:999px;border:1px solid rgba(180, 83, 9, 0.24);background:rgba(245, 158, 11, 0.18);color:#b45309;font-weight:800;font-size:0.78em;letter-spacing:0.04em;line-height:1.2;vertical-align:middle;">避免</span> 过度使用 Markdown 格式技巧
+
+规则描述：注释中不要为了排版效果堆砌过多 Markdown 结构，优先保持可读、简洁和 IDE 友好。
+
+采纳理由：过重的排版会让注释更像文章而不是开发文档，也容易在不同工具里呈现不一致。
+
+官方来源：[Effective Dart / AVOID using markdown excessively](/effective-dart/documentation#avoid-using-markdown-excessively)
+
+相关 lints：无，主要依赖 review 执行。

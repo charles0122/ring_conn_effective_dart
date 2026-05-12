@@ -1,0 +1,44 @@
+---
+title: 团队规范：用法
+description: 团队当前采纳的 Dart 语言特性使用规范。
+prevpage:
+  url: /team-guidelines/documentation
+  title: 文档
+nextpage:
+  url: /team-guidelines/design
+  title: API 设计
+---
+
+# 团队规范：用法
+
+这里记录团队对常见语言特性和集合、异步、导入写法的采纳结论。
+
+### <span style="display:inline-block;padding:0.18rem 0.58rem;margin-right:0.45rem;border-radius:999px;border:1px solid rgba(21, 128, 61, 0.24);background:rgba(34, 197, 94, 0.16);color:#15803d;font-weight:800;font-size:0.78em;letter-spacing:0.04em;line-height:1.2;vertical-align:middle;">必须</span> 优先使用集合字面量
+
+规则描述：在能够直接表达意图时，优先使用 `[]`、`{}`、`<T>[]` 这类集合字面量，而不是 `List.from()`、`Map()` 等构造方式。
+
+采纳理由：集合字面量更短、更直接，也更符合 Dart 生态日常阅读习惯。
+
+官方来源：[Effective Dart / DO use collection literals when possible](/effective-dart/usage#do-use-collection-literals-when-possible)
+
+相关 lints：无，主要依赖 review 执行。
+
+### <span style="display:inline-block;padding:0.18rem 0.58rem;margin-right:0.45rem;border-radius:999px;border:1px solid rgba(185, 28, 28, 0.24);background:rgba(239, 68, 68, 0.16);color:#b91c1c;font-weight:800;font-size:0.78em;letter-spacing:0.04em;line-height:1.2;vertical-align:middle;">禁止</span> 使用 `.length` 判断集合是否为空
+
+规则描述：判断集合是否为空时，统一使用 `isEmpty` 或 `isNotEmpty`，不要写 `list.length == 0` 或 `list.length > 0`。
+
+采纳理由：`isEmpty` / `isNotEmpty` 语义更直接，也避免某些集合上 `.length` 不是常量时间的误用。
+
+官方来源：[Effective Dart / DON'T use `.length` to see if a collection is empty](/effective-dart/usage#dont-use-length-to-see-if-a-collection-is-empty)
+
+相关 lints：`prefer_is_empty`
+
+### <span style="display:inline-block;padding:0.18rem 0.58rem;margin-right:0.45rem;border-radius:999px;border:1px solid rgba(29, 78, 216, 0.24);background:rgba(59, 130, 246, 0.16);color:#1d4ed8;font-weight:800;font-size:0.78em;letter-spacing:0.04em;line-height:1.2;vertical-align:middle;">推荐</span> 使用字符串插值组合值
+
+规则描述：拼接字符串和变量时，优先使用字符串插值，不要把大量 `+` 拼接写成手工串联。
+
+采纳理由：插值更接近自然语言，也更容易在重构时保留正确的空格和标点。
+
+官方来源：[Effective Dart / PREFER using interpolation to compose strings and values](/effective-dart/usage#prefer-using-interpolation-to-compose-strings-and-values)
+
+相关 lints：`prefer_interpolation_to_compose_strings`

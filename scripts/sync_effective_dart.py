@@ -191,6 +191,23 @@ def style_guideline_heading(line: str) -> str:
     return line
 
 
+def inject_reference_notice(content: str) -> str:
+    match = re.match(r"(?s)\A(---\n.*?\n---\n)", content)
+    if not match:
+        return content
+
+    notice = (
+        "> 参考说明\n"
+        ">\n"
+        "> 本分组同步自官方 Effective Dart 中文内容，用于查阅官方建议。\n"
+        "> 这里的 `DO / DON'T / PREFER / AVOID / CONSIDER` 表示官方语义，\n"
+        "> 不等同于团队规范中的 `必须 / 禁止 / 推荐 / 避免 / 视情况`。\n"
+        "> 团队是否采纳，请以 [团队规范](/team-guidelines) 为准。\n\n"
+    )
+
+    return content[: match.end(1)] + notice + content[match.end(1) :]
+
+
 def transform_markdown(content: str) -> str:
     lines = content.splitlines(keepends=True)
     output: list[str] = []
@@ -287,6 +304,8 @@ def write_pages() -> None:
     for page in SOURCE_PAGES:
         source = fetch_page(page)
         transformed = transform_markdown(source)
+        if page == "index":
+            transformed = inject_reference_notice(transformed)
         (OUTPUT_DIR / f"{page}.mdx").write_text(transformed, encoding="utf-8")
 
 
