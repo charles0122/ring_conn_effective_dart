@@ -34,6 +34,10 @@
         {
           "title": "API 设计",
           "href": "/team-guidelines/design"
+        },
+        {
+          "title": "Figma 开发操作",
+          "href": "/team-guidelines/figma-dev-mode"
         }
       ]
     },

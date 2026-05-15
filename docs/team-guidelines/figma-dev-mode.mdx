@@ -1,0 +1,667 @@
+---
+title: 团队规范：Figma 开发操作
+description: 面向 Flutter 开发者的 Figma Dev Mode 常用操作手册。
+prevpage:
+  url: /team-guidelines/design
+  title: API 设计
+---
+
+# 团队规范：Figma 开发操作
+
+本文面向 Flutter 开发者，重点说明开发时如何使用 Figma 和 Dev Mode 获取实现页面所需的信息。
+
+开发过程中，Figma 不只是“看设计稿”的地方，更是确认页面状态、读取尺寸、查看间距、导出资源、对比变更、追踪评论和理解组件变体的工作台。
+
+官方参考：[Figma Guide to Dev Mode](https://help.figma.com/hc/en-us/articles/15023124644247-Guide-to-Dev-Mode)
+
+## 快速操作索引
+
+常用操作可以先按这个顺序走：
+
+1. 打开设计链接，使用 `Shift + D` 进入 Dev Mode。
+2. 在左侧找到标记为 `Ready for development` 的页面或组件。
+3. 点击目标 Frame，让画布定位到具体设计。
+4. 选中页面外层 Frame，查看整体尺寸、背景、布局方向和页面说明。
+5. 逐层点击内部元素，查看 padding、gap、颜色、文字、圆角、阴影。
+6. 选中图标或图片，检查是否可以导出，以及导出格式是否正确。
+7. 如果设计有更新，使用 `Compare changes` 查看变更范围。
+8. 遇到不明确的状态或交互，在 Figma 评论里直接标注问题。
+
+## 打开和切换模式
+
+### 进入 Dev Mode
+
+打开 Figma 文件后，点击顶部工具栏的 `Dev Mode`，或直接按：
+
+```text
+Shift + D
+```
+
+进入后，界面会更偏向开发检查：左侧显示可开发内容和图层，右侧显示 Inspect 信息、代码片段、资源和属性。
+
+### 退出 Dev Mode
+
+再次按 `Shift + D`，或点击顶部工具栏从 Dev Mode 切回 Design mode。
+
+一般开发不需要切回 Design mode，除非你要查看设计页面结构、搜索更多画布内容，或者和设计师一起定位某个原始组件。
+
+### 打开 Dev Mode 链接
+
+设计师如果发送的是 Dev Mode 链接，打开后通常会直接进入 Dev Mode，并定位到指定页面、组件或注释。
+
+如果打开后没有定位到目标位置，可以先检查链接是否包含具体 Frame，或让设计师重新复制当前选中 Frame 的链接。
+
+## 找到要开发的内容
+
+### 查看 Ready 状态
+
+在 Dev Mode 左侧面板查看 `Ready for development` 列表。
+
+开发优先级：
+
+- 优先开发已标记 `Ready for development` 的页面、组件、Section。
+- 未标记 Ready 的内容，不建议直接开发。
+- 如果任务已经明确要求开发未 Ready 的内容，需要在任务记录中注明来源。
+
+### 定位目标 Frame
+
+在左侧点击目标页面或组件后，Figma 会把画布定位到对应 Frame。
+
+如果画布上内容很多，可以使用这些方式定位：
+
+- 点击左侧 Ready 列表中的页面。
+- 使用搜索查找页面名、组件名或图层名。
+- 让设计师发送具体 Frame 链接。
+- 在任务或 PR 中保存目标 Frame 链接，方便后续回看。
+
+### 复制当前 Frame 链接
+
+选中目标 Frame 后，可以复制链接给其他人确认。
+
+建议复制链接时先选中最外层 Frame，而不是某个内部文本或图标。这样别人打开后能看到完整上下文。
+
+## 阅读图层结构
+
+### 查看页面层级
+
+选中页面 Frame 后，左侧会显示当前 Frame 内的图层树。
+
+读图层时建议从外到内：
+
+- 先看页面外层 Frame。
+- 再看主要区域，比如 Header、Content、Footer、Tab、Card。
+- 最后看文本、图标、图片和状态元素。
+
+### 映射到 Flutter Widget
+
+常见映射关系：
+
+- Figma `Frame`：通常对应页面、模块或 Widget 容器。
+- Figma `Auto Layout`：通常对应 `Row`、`Column`、`Wrap`、`Padding`、`Align`。
+- Figma `Absolute position`：可能对应 `Stack`、`Positioned`，但不要默认滥用。
+- Figma `Component`：通常对应可复用 Flutter Widget。
+- Figma `Instance`：通常对应使用某个 Widget 并传入不同参数。
+- Figma `Variant`：通常对应 enum、bool 或状态参数。
+
+### 判断是否该用 Stack
+
+只有在元素确实存在叠放关系时，才优先考虑 `Stack`：
+
+- 角标压在头像或卡片上。
+- 背景图上叠文字。
+- 弹层、浮层、徽标、遮罩。
+- 页面中存在真实覆盖关系。
+
+如果只是普通上下排列或左右排列，应优先使用 `Column`、`Row`、`Padding` 和 `SizedBox`。
+
+## 查看尺寸和间距
+
+### 查看元素尺寸
+
+选中任意图层后，右侧 Inspect 面板会显示宽高。
+
+Flutter 中处理尺寸时建议：
+
+- 图标、头像、按钮高度、卡片圆角可以使用固定值。
+- 页面宽度、列表高度、内容区域不要直接照抄固定值。
+- 要考虑不同屏幕宽度、文字缩放和多语言。
+- Figma 的 px 通常先按 Flutter logical pixel 参考。
+
+### 查看两个元素之间的距离
+
+常用方式：
+
+- 选中一个元素后，移动鼠标到另一个元素上查看相对距离。
+- 按住 `Option` 查看选中元素与周围元素或容器的距离。
+- 选中父级 Auto Layout，直接查看 gap 和 padding。
+
+开发时优先记录这些值：
+
+- 页面左右边距。
+- 卡片内部 padding。
+- 标题与正文之间的距离。
+- 图标与文本之间的距离。
+- 列表项之间的距离。
+- 底部按钮和安全区域之间的距离。
+
+### 查看 padding
+
+选中 Auto Layout 容器后，右侧会显示上下左右 padding。
+
+Flutter 常见写法：
+
+```dart
+Padding(
+  padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+  child: child,
+)
+```
+
+如果左右或上下相同，优先写成：
+
+```dart
+Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  child: child,
+)
+```
+
+### 查看 gap
+
+Auto Layout 中的 gap 通常可以映射为 `SizedBox`、`spacing` 参数或项目内间距组件。
+
+```dart
+Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Text(title),
+    const SizedBox(height: 8),
+    Text(description),
+  ],
+)
+```
+
+如果项目已有统一 spacing token，优先使用 token，不要到处手写裸数字。
+
+## 查看 Auto Layout
+
+### 识别布局方向
+
+选中 Auto Layout 容器后，先看方向：
+
+- 横向 Auto Layout：通常对应 `Row`。
+- 纵向 Auto Layout：通常对应 `Column`。
+- 自动换行：通常对应 `Wrap`。
+
+### 查看主轴和交叉轴对齐
+
+常见映射：
+
+- 左对齐：`CrossAxisAlignment.start`
+- 居中对齐：`CrossAxisAlignment.center`
+- 右对齐：`CrossAxisAlignment.end`
+- 两端分布：`MainAxisAlignment.spaceBetween`
+- 居中排列：`MainAxisAlignment.center`
+
+示例：
+
+```dart
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: [
+    Text(title),
+    IconButton(
+      onPressed: onPressed,
+      icon: const Icon(Icons.chevron_right),
+    ),
+  ],
+)
+```
+
+### 查看 Hug 和 Fill
+
+Figma 常见尺寸策略：
+
+- `Hug contents`：尺寸跟随内容，Flutter 中常常不需要写死宽高。
+- `Fill container`：填满父容器，Flutter 中常对应 `Expanded`、`Flexible` 或约束宽度。
+- `Fixed`：固定尺寸，Flutter 中可以用 `SizedBox` 或明确宽高。
+
+示例：
+
+```dart
+Row(
+  children: [
+    const Icon(Icons.info_outline),
+    const SizedBox(width: 8),
+    Expanded(
+      child: Text(message),
+    ),
+  ],
+)
+```
+
+## 查看颜色和文本
+
+### 复制颜色
+
+选中图层后，在右侧 Inspect 面板查看 fill、stroke、effect 等颜色。
+
+开发时优先顺序：
+
+1. 使用项目已有颜色 token。
+2. 使用项目主题中的 `ColorScheme`。
+3. 新增设计系统颜色常量。
+4. 最后才临时使用 `Color(0xFF...)`，并在后续整理。
+
+不要因为 Figma 能复制 hex，就把颜色散落在业务代码里。
+
+### 查看文本样式
+
+选中文本图层后，重点看：
+
+- font size
+- font weight
+- line height
+- letter spacing
+- color
+- text alignment
+- max lines 或截断规则
+
+Flutter 示例：
+
+```dart
+Text(
+  title,
+  maxLines: 2,
+  overflow: TextOverflow.ellipsis,
+  style: context.textTheme.titleMedium,
+)
+```
+
+如果 Figma 样式和项目 `TextTheme` 对不上，应优先确认是否需要新增或调整 token，而不是在页面里写一套临时 `TextStyle`。
+
+### 判断文本是否需要适配
+
+看到文本时要主动检查：
+
+- 中文是否可能变长。
+- 英文是否可能比中文更长。
+- 数字、单位、日期格式是否会变化。
+- 系统字体放大后是否会溢出。
+- 是否需要 `maxLines` 和 `overflow`。
+
+## 查看圆角、边框和阴影
+
+### 查看圆角
+
+选中容器后，查看 corner radius。
+
+Flutter 示例：
+
+```dart
+Container(
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(12),
+  ),
+)
+```
+
+如果四个角不一致，需要使用：
+
+```dart
+BorderRadius.only(
+  topLeft: Radius.circular(12),
+  topRight: Radius.circular(12),
+)
+```
+
+### 查看边框
+
+选中图层后，查看 stroke 的颜色、宽度和位置。
+
+Flutter 常见写法：
+
+```dart
+BoxDecoration(
+  border: Border.all(
+    color: borderColor,
+    width: 1,
+  ),
+)
+```
+
+### 查看阴影
+
+选中图层后，查看 effect 中的 shadow 参数。
+
+需要关注：
+
+- x offset
+- y offset
+- blur
+- spread
+- color
+- opacity
+
+Flutter 中阴影通常需要结合视觉效果微调，不一定能完全机械复制。
+
+## 查看组件和变体
+
+### 查看组件来源
+
+选中 Instance 后，可以看到它来自哪个 Component。
+
+开发时建议：
+
+- 如果设计组件已有对应 Flutter 组件，优先复用。
+- 如果没有对应组件，先判断是否应该抽成公共 Widget。
+- 如果只是一次性业务布局，再放在当前页面内部实现。
+
+### 查看变体属性
+
+组件可能有不同 variant，比如：
+
+- size：small、medium、large
+- type：primary、secondary、danger
+- state：default、hover、pressed、disabled、loading
+- icon：leading、trailing、none
+
+Flutter 中可以映射为：
+
+```dart
+enum AppButtonType {
+  primary,
+  secondary,
+  danger,
+}
+```
+
+```dart
+AppButton(
+  type: AppButtonType.primary,
+  isLoading: isSubmitting,
+  onPressed: onSubmit,
+  child: const Text('保存'),
+)
+```
+
+### 使用 component playground
+
+如果 Dev Mode 中有 component playground，可以用它切换组件属性，查看不同状态下的样式变化。
+
+适合检查：
+
+- 按钮 disabled 和 loading 的差异。
+- 输入框 error、focused、disabled 的差异。
+- 卡片 selected 和 default 的差异。
+- 有图标和无图标时的间距变化。
+
+## 导出资源
+
+### 查看可导出资源
+
+选中图标、图片或组件后，在右侧查看 Export 区域。
+
+如果没有导出项，可能是设计师没有配置 export，也可能当前选中的不是正确图层。
+
+### 图标导出
+
+图标优先使用 SVG。
+
+导出前检查：
+
+- 图标是否为矢量。
+- 画板尺寸是否符合项目规范。
+- 是否包含多余透明边距。
+- 命名是否清楚。
+- 是否已有相同图标，避免重复导入。
+
+### 图片导出
+
+图片、插画、背景图导出前检查：
+
+- 格式是 PNG、JPG 还是 WebP。
+- 是否需要 1x、2x、3x。
+- 是否需要透明背景。
+- 文件体积是否合理。
+- 是否可由 Flutter 绘制而不是导出整张图。
+
+### 导入 Flutter 项目
+
+导出资源后，记得检查：
+
+- 文件名是否符合项目命名规范。
+- 是否放入正确 assets 目录。
+- 是否更新 `pubspec.yaml`。
+- 是否使用项目已有资源生成工具。
+- 是否在不同分辨率设备上检查显示效果。
+
+## 查看代码片段
+
+### 使用 Dev Mode 代码片段
+
+Dev Mode 会显示部分自动生成代码，或通过插件显示其他语言代码。
+
+Flutter 开发时可以参考：
+
+- spacing
+- size
+- radius
+- color
+- typography
+- shadow
+- asset
+
+不要直接照搬：
+
+- CSS absolute positioning
+- HTML 结构
+- React / Swift / Android 片段
+- 不符合项目组件体系的样式
+- 大量重复的硬编码样式
+
+### 把代码片段转成 Flutter
+
+如果看到类似设计规格：
+
+```text
+padding: 16px 12px
+gap: 8px
+border-radius: 12px
+```
+
+可以转成：
+
+```dart
+Container(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(12),
+  ),
+  child: Row(
+    children: [
+      icon,
+      const SizedBox(width: 8),
+      Expanded(child: label),
+    ],
+  ),
+)
+```
+
+## 查看注释和交互说明
+
+### 查看评论
+
+打开评论面板，检查当前页面是否有设计师、产品或开发留下的说明。
+
+重点关注：
+
+- 验收要求。
+- 特殊状态。
+- 跳转逻辑。
+- 数据格式。
+- 设计未覆盖的边界情况。
+
+### 添加评论
+
+如果实现时发现问题，可以直接在 Figma 对应位置添加评论。
+
+推荐问题写法：
+
+```text
+这里的标题超过两行时是截断还是撑高卡片？
+按钮 loading 时是否隐藏右侧图标？
+这个空态是否需要同时覆盖无权限和无数据两种情况？
+底部按钮是否需要避开 iOS safe area？
+```
+
+评论要尽量定位到具体图层或页面区域，不要只在任务里写“设计有问题”。
+
+## 对比设计变更
+
+### 打开 Compare changes
+
+如果设计稿发生更新，Dev Mode 中可能出现 `Compare changes`。
+
+进入后重点看：
+
+- 新增了什么。
+- 删除了什么。
+- 哪些属性发生变化。
+- 变更影响的是页面、组件还是资源。
+
+### 判断是否需要改代码
+
+设计变更通常分几类：
+
+- 视觉变更：颜色、字号、圆角、阴影、间距。
+- 结构变更：布局、层级、模块顺序、组件拆分。
+- 状态变更：新增 loading、empty、error、disabled、selected。
+- 资源变更：替换图标、图片、动效。
+- 交互变更：点击行为、跳转、弹窗、手势。
+
+如果只是局部视觉变更，可以直接改对应 Widget 或 token。如果是组件结构或状态变更，优先检查是否影响公共组件和已有页面。
+
+### 在 PR 中说明变更来源
+
+当代码改动来自设计更新时，PR 描述里建议贴上 Figma 链接，并说明：
+
+- 对应页面或组件。
+- 设计变更点。
+- 是否影响公共组件。
+- 是否已验证主要状态。
+
+## 使用外部集成
+
+### 打开关联任务
+
+Dev Mode 可能关联 Jira、GitHub、文档、Storybook 或其他工具。
+
+开发前建议先打开：
+
+- Jira：确认需求范围和验收条件。
+- GitHub：确认已有 PR、issue 或相关代码。
+- Storybook：确认已有组件行为。
+- 文档：确认业务规则和数据格式。
+
+### 使用 VS Code 扩展
+
+如果团队安装了 Figma for VS Code，可以在编辑器里查看设计、评论和变更。
+
+适合场景：
+
+- 一边写 Widget，一边对照设计。
+- 修改已有组件时查看对应设计变体。
+- 快速打开 Figma 链接确认尺寸。
+- 查看评论而不用频繁切换窗口。
+
+## Flutter 开发落地清单
+
+开发一个页面时，建议按这个清单执行：
+
+1. 打开目标 Figma 链接。
+2. 进入 Dev Mode。
+3. 确认页面是 `Ready for development`。
+4. 打开任务链接，确认需求范围。
+5. 选中外层 Frame，确认页面整体结构。
+6. 逐个查看主要区域的 Auto Layout。
+7. 记录页面边距、模块间距和卡片 padding。
+8. 检查所有文本样式是否能映射到项目主题。
+9. 检查颜色是否来自项目 token。
+10. 查看图标和图片是否需要导出。
+11. 查看组件 variants 和状态。
+12. 检查评论和交互说明。
+13. 写 Flutter 结构，不直接照抄绝对坐标。
+14. 实现后回到 Figma 对照尺寸、间距、颜色、状态。
+15. 如果设计更新，使用 `Compare changes` 再核对一次。
+
+## 常见问题处理
+
+### 图层点不到想看的元素
+
+可以尝试：
+
+- 从左侧图层树中选择。
+- 放大画布后再点。
+- 先选中父级 Frame，再展开内部层级。
+- 让设计师确认是否有透明遮罩或隐藏图层。
+
+### Inspect 里看不到预期属性
+
+可能原因：
+
+- 选中的不是目标图层。
+- 当前元素是 Instance，需要进入内部或查看组件属性。
+- 设计没有使用 Auto Layout。
+- 属性来自父级容器，而不是当前子元素。
+
+### 间距看起来和 Inspect 不一致
+
+优先检查：
+
+- 是否选错了父级。
+- 是否存在透明占位图层。
+- 是否有 stroke 影响视觉边界。
+- 是否有阴影导致视觉上看起来更大。
+- 是否使用了 absolute position。
+
+### 资源导出后大小不对
+
+优先检查：
+
+- 是否选中了正确图层。
+- 是否包含多余透明区域。
+- 导出倍率是否正确。
+- 设计师是否把图标放在固定尺寸画板里。
+- Flutter 中是否又额外设置了宽高或 BoxFit。
+
+### 设计没有覆盖某个状态
+
+不要自己猜。优先在 Figma 评论或任务中确认：
+
+- loading
+- empty
+- error
+- disabled
+- selected
+- permission denied
+- offline
+- long text
+- small screen
+
+## 提交前 Figma 对照
+
+PR 前建议最后对照一次：
+
+- 页面是否来自最新 Ready 设计。
+- 外层边距是否一致。
+- 模块间距是否一致。
+- 文本字号、字重、行高是否一致。
+- 颜色是否使用项目 token。
+- 圆角、边框、阴影是否一致。
+- 图片和图标是否清晰且尺寸正确。
+- 主要状态是否覆盖。
+- 小屏和长文本是否不会破版。
+- PR 中是否附上 Figma 链接。
+
