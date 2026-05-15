@@ -27,6 +27,10 @@ prevpage:
 7. 如果设计有更新，使用 `Compare changes` 查看变更范围。
 8. 遇到不明确的状态或交互，在 Figma 评论里直接标注问题。
 
+<Image zoom src="./figma-dev-mode-images/figma-dev-mode-overview.jpg" alt="Figma Dev Mode 总览截图" caption="Figma Dev Mode 总览：左侧页面和图层、中间画布、右侧 Inspect 面板。" />
+
+上图是 Dev Mode 的常见工作区：左侧找可开发内容，中间看设计画布，右侧读取 Inspect 规格。
+
 ## 打开和切换模式
 
 ### 进入 Dev Mode
@@ -38,6 +42,10 @@ Shift + D
 ```
 
 进入后，界面会更偏向开发检查：左侧显示可开发内容和图层，右侧显示 Inspect 信息、代码片段、资源和属性。
+
+<Image zoom src="./figma-dev-mode-images/figma-dev-toolbar.jpg" alt="Figma Dev Mode 底部开发工具栏截图" caption="底部开发工具栏：绿色代码图标表示当前处于 Dev Mode。" />
+
+上图底部工具栏中，绿色代码图标表示当前处于 Dev Mode。开发时如果发现右侧没有 Inspect 信息，先确认是否已经切到开发模式。
 
 ### 退出 Dev Mode
 
@@ -62,6 +70,12 @@ Shift + D
 - 优先开发已标记 `Ready for development` 的页面、组件、Section。
 - 未标记 Ready 的内容，不建议直接开发。
 - 如果任务已经明确要求开发未 Ready 的内容，需要在任务记录中注明来源。
+
+开发时优先从左侧 Ready 列表进入目标页面，不要在整张画布里“凭感觉”找稿。
+
+<Image zoom src="./figma-dev-mode-images/figma-left-ready-layers.jpg" alt="Figma 左侧页面、Ready 和图层面板截图" caption="左侧面板：页面列表、Ready for development 区域和图层树。" />
+
+左侧面板主要看三块：页面列表、`Ready for development` 区域、图层树。开发时先定位页面，再展开图层树确认 Frame 层级。
 
 ### 定位目标 Frame
 
@@ -92,6 +106,10 @@ Shift + D
 - 再看主要区域，比如 Header、Content、Footer、Tab、Card。
 - 最后看文本、图标、图片和状态元素。
 
+<Image zoom src="./figma-dev-mode-images/figma-canvas-frames.jpg" alt="Figma 画布中的 Frame 和页面结构截图" caption="画布区域：多个手机 Frame 通常代表页面状态或组件状态。" />
+
+画布中每个手机界面通常是一个 Frame。开发时可以把这些 Frame 当作页面状态或组件状态来对照，而不是只看单张静态截图。
+
 ### 映射到 Flutter Widget
 
 常见映射关系：
@@ -120,6 +138,10 @@ Shift + D
 
 选中任意图层后，右侧 Inspect 面板会显示宽高。
 
+<Image zoom src="./figma-dev-mode-images/figma-inspect-panel.jpg" alt="Figma 右侧 Inspect 面板截图" caption="右侧 Inspect 面板：检查模式、代码设置和 MCP 区域。" />
+
+右侧 Inspect 面板会随当前选中对象变化。选中页面时看到的是页面级信息；选中具体图层或组件时，才会看到更细的尺寸、样式、资源和代码信息。
+
 Flutter 中处理尺寸时建议：
 
 - 图标、头像、按钮高度、卡片圆角可以使用固定值。
@@ -143,6 +165,8 @@ Flutter 中处理尺寸时建议：
 - 图标与文本之间的距离。
 - 列表项之间的距离。
 - 底部按钮和安全区域之间的距离。
+
+测距时最常用的是“选中元素 + 按住 `Option` + 移到目标元素”。这个动作适合快速确认 Flutter 里的 `Padding`、`SizedBox` 和模块间距。
 
 ### 查看 padding
 
@@ -240,6 +264,8 @@ Row(
   ],
 )
 ```
+
+看到 Auto Layout 时，先不要急着写代码。先在右侧确认方向、padding、gap、Hug / Fill，再决定用 `Row`、`Column`、`Expanded` 还是固定尺寸。
 
 ## 查看颜色和文本
 
@@ -405,6 +431,8 @@ AppButton(
 
 如果没有导出项，可能是设计师没有配置 export，也可能当前选中的不是正确图层。
 
+导出资源时先确认选中的是正确图层。图标优先导出 SVG，图片再根据场景选择 PNG、JPG 或 WebP。
+
 ### 图标导出
 
 图标优先使用 SVG。
@@ -530,6 +558,8 @@ Container(
 - 删除了什么。
 - 哪些属性发生变化。
 - 变更影响的是页面、组件还是资源。
+
+设计更新后先看差异，再改代码。这样可以避免把组件重构、资源替换和简单视觉调整混在一起处理。
 
 ### 判断是否需要改代码
 
@@ -664,4 +694,3 @@ PR 前建议最后对照一次：
 - 主要状态是否覆盖。
 - 小屏和长文本是否不会破版。
 - PR 中是否附上 Figma 链接。
-
