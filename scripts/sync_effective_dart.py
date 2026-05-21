@@ -14,6 +14,29 @@ BASE_URL = (
 SOURCE_PAGES = ["index", "style", "documentation", "usage", "design"]
 OUTPUT_DIR = Path("docs/effective-dart")
 
+PAGE_METADATA = {
+    "index": {
+        "title": "高效 Dart 语言指南",
+        "description": "官方 Dart 代码实践建议的中文参考。",
+    },
+    "style": {
+        "title": "高效 Dart 语言指南：代码风格",
+        "description": "通过格式化与命名规则来确保代码的统一性和可读性。",
+    },
+    "documentation": {
+        "title": "高效 Dart 语言指南：文档",
+        "description": "通过注释与文档约定提升 Dart 代码的可读性。",
+    },
+    "usage": {
+        "title": "高效 Dart 语言指南：用法示例",
+        "description": "指导你利用语言特性写出便于维护的代码。",
+    },
+    "design": {
+        "title": "高效 Dart 语言指南：API 设计",
+        "description": "总结可读、易用且一致的 Dart API 设计建议。",
+    },
+}
+
 SITE_VARIABLES = {
     "{{site.dart-api}}": "https://api.dart.dev",
     "{{site.pub-pkg}}": "https://pub.dev/packages",
@@ -63,11 +86,32 @@ CHINESE_GUIDELINE_MAP = {
     "考虑": "CONSIDER",
 }
 
+CHINESE_TEXT_PATTERN = re.compile(r"[\u3400-\u9fff]")
+
 
 def fetch_page(name: str) -> str:
     url = f"{BASE_URL}/{name}.md"
     with urllib.request.urlopen(url) as response:
         return response.read().decode("utf-8")
+
+
+def localize_frontmatter(page: str, content: str) -> str:
+    metadata = PAGE_METADATA[page]
+    content = re.sub(
+        r"^title:\s*.*$",
+        f'title: {metadata["title"]}',
+        content,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    content = re.sub(
+        r"^description:\s*.*$",
+        f'description: {metadata["description"]}',
+        content,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    return content
 
 
 def normalize_path(path: str) -> str:
@@ -171,13 +215,6 @@ def build_guideline_badge(label: str, tone: str) -> str:
 
 
 def style_guideline_heading(line: str) -> str:
-    english_match = re.match(r"^(### )(?P<label>DO|DON'T|PREFER|AVOID|CONSIDER)\b(?P<rest>.*)$", line)
-    if english_match:
-        label = english_match.group("label")
-        rest = english_match.group("rest")
-        badge = build_guideline_badge(label, label)
-        return f"{english_match.group(1)}{badge} {rest.lstrip()}\n"
-
     chinese_match = re.match(
         r"^(### )\*\*(?P<label>要|不要|推荐|避免|考虑)\*\*(?P<rest>.*)$",
         line,
@@ -191,6 +228,38 @@ def style_guideline_heading(line: str) -> str:
     return line
 
 
+def should_skip_english_line(line: str) -> bool:
+    stripped = line.strip()
+    if not stripped:
+        return False
+
+    if CHINESE_TEXT_PATTERN.search(stripped):
+        return False
+
+    if stripped in {"---", ">", "*", "-", "1.", "2.", "3.", "4.", "5.", "6."}:
+        return False
+
+    if re.match(r"^\[[^\]]+\]:\s+\S+", stripped):
+        return False
+
+    if stripped.startswith(("title:", "description:", "nextpage:", "prevpage:", "url:")):
+        return False
+
+    if stripped.startswith(("```", "<span", "<br")):
+        return False
+
+    if re.match(r"^[\[`(].*", stripped):
+        return False
+
+    if stripped.startswith("#") and re.search(r"[A-Za-z]{2,}", stripped):
+        return True
+
+    if re.search(r"[A-Za-z]{2,}", stripped):
+        return True
+
+    return False
+
+
 def inject_reference_notice(content: str) -> str:
     match = re.match(r"(?s)\A(---\n.*?\n---\n)", content)
     if not match:
@@ -199,8 +268,8 @@ def inject_reference_notice(content: str) -> str:
     notice = (
         "> 参考说明\n"
         ">\n"
-        "> 本分组同步自官方 Effective Dart 中文内容，用于查阅官方建议。\n"
-        "> 这里的 `DO / DON'T / PREFER / AVOID / CONSIDER` 表示官方语义，\n"
+        "> 本分组同步自官方《高效 Dart 语言指南》中文内容，用于查阅官方建议。\n"
+        "> 这里的 `要 / 不要 / 推荐 / 避免 / 考虑` 表示官方语义，\n"
         "> 不等同于团队规范中的 `必须 / 禁止 / 推荐 / 避免 / 视情况`。\n"
         "> 团队是否采纳，请以 [团队规范](/team-guidelines) 为准。\n\n"
     )
@@ -258,6 +327,9 @@ def transform_markdown(content: str) -> str:
         if stripped.startswith("# breadcrumb:") or stripped.startswith("breadcrumb:"):
             continue
 
+        if stripped.startswith(("# title:", "# description:")):
+            continue
+
         if stripped == "{{site.alert.end}}":
             continue
 
@@ -294,6 +366,8 @@ def transform_markdown(content: str) -> str:
         line = replace_root_links(line)
         line = replace_inline_type_tags(line)
         line = style_guideline_heading(line)
+        if should_skip_english_line(line):
+            continue
         output.append(line)
 
     return "".join(output)
@@ -302,7 +376,7 @@ def transform_markdown(content: str) -> str:
 def write_pages() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     for page in SOURCE_PAGES:
-        source = fetch_page(page)
+        source = localize_frontmatter(page, fetch_page(page))
         transformed = transform_markdown(source)
         if page == "index":
             transformed = inject_reference_notice(transformed)
