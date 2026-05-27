@@ -24,6 +24,19 @@ python3 scripts/sync_effective_dart.py
 - `docs/team-guidelines/` 由团队手工维护，不会被同步脚本覆盖
 - `docs/effective-dart/` 由同步脚本生成，用于官方参考
 
+## 生成 Stylistic 候选规则评审表
+
+执行下面的命令会从 `saropa_lints` 的 `README_STYLISTIC.md` 生成团队讨论用的评审页和 CSV：
+
+```bash
+python3 scripts/sync_stylistic_review.py
+```
+
+生成内容：
+
+- `docs/team-guidelines/stylistic-review.mdx`
+- `docs/assets/stylistic-rule-review.csv`
+
 ## 本地预览
 
 `docs.page` 官方的本地预览方式是浏览器直接读取当前目录：

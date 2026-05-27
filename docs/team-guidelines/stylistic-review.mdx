@@ -1,0 +1,2201 @@
+---
+title: 团队规范：风格候选规则评审
+description: 基于 saropa_lints 的候选风格规则评审表，用于团队会前预读与会议取舍。
+prevpage:
+  url: /team-guidelines/figma-dev-mode
+  title: Figma 开发操作
+---
+
+<!-- 由 scripts/sync_stylistic_review.py 自动生成，请勿手工编辑规则表。 -->
+
+# 团队规范：风格候选规则评审
+
+这份评审表用于团队会议前后统一讨论 `saropa_lints` 的风格规则取舍。
+规则名称与上游 lint id 保持一致，便于直接映射到 `analysis_options.yaml`。
+
+上游来源：[saropa_lints / README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)
+
+配套 CSV：[下载候选规则评审表](/assets/stylistic-rule-review.csv)
+
+最近一次同步日期：`2026-05-27`
+
+## 使用建议
+
+1. 会前先顺着本页逐条预读，在每条规则的 `评审记录模板` 里记录自己的倾向。
+2. 会议中优先讨论下面的“二选一冲突规则”，这些规则必须成对取舍。
+3. 对 `低成本候选` 可以优先试运行，再决定是否升级为团队正式规范。
+4. 对 `项目/业务相关` 或 `版本前提` 的规则，先确认适用范围，再决定是否纳入团队规范。
+
+> 说明
+>
+> 这份页面已经改成“逐条评审版”。主体部分不再依赖大表格，而是每条规则一个小节，方便在 `docs.page` 中一条条讨论、复制、记录会议结论。
+> `中文释义` 便于会前快速理解规则意图；`示例` 会优先复用上游 README 中已经提供的 BAD / GOOD 对照。
+> 没有示例的规则暂时留空，避免生成误导性的伪示例。
+
+## 初筛统计
+
+- 总候选规则：`87`
+- 二选一规则：`46` 条，对应 `24` 组冲突项
+- 低成本候选：`15` 条
+- 通用候选：`17` 条
+- 项目/业务相关：`7` 条
+- 版本前提：`2` 条
+
+## 初筛分组说明
+
+- `二选一`：存在明确对立规则，需要在会议里成对决策。
+- `低成本候选`：可自动修复或迁移成本较低，适合先试运行。
+- `通用候选`：没有明显对立项，也不强依赖具体业务，适合先异步预投票。
+- `项目/业务相关`：更像团队或业务约束，不建议脱离项目上下文直接采纳。
+- `版本前提`：依赖 Flutter 或 SDK 版本，需要先确认技术前提。
+
+## 快速导航
+
+- [通用风格规则](#通用风格规则)
+  - [`arguments_ordering`](#arguments_ordering)
+  - [`avoid_small_text`](#avoid_small_text)
+  - [`capitalize_comment`](#capitalize_comment)
+  - [`prefer_arrow_functions`](#prefer_arrow_functions)
+  - [`prefer_curly_apostrophe`](#prefer_curly_apostrophe)
+  - [`prefer_doc_comments_over_regular`](#prefer_doc_comments_over_regular)
+  - [`prefer_doc_curly_apostrophe`](#prefer_doc_curly_apostrophe)
+  - [`prefer_doc_straight_apostrophe`](#prefer_doc_straight_apostrophe)
+  - [`prefer_period_after_doc`](#prefer_period_after_doc)
+  - [`prefer_relative_imports`](#prefer_relative_imports)
+  - [`prefer_screaming_case_constants`](#prefer_screaming_case_constants)
+  - [`prefer_sentence_case_comments`](#prefer_sentence_case_comments)
+  - [`prefer_single_quotes`](#prefer_single_quotes)
+  - [`prefer_straight_apostrophe`](#prefer_straight_apostrophe)
+  - [`prefer_trailing_comma_always`](#prefer_trailing_comma_always)
+  - [`prefer_all_named_parameters`](#prefer_all_named_parameters)
+  - [`prefer_class_over_record_return`](#prefer_class_over_record_return)
+  - [`prefer_descriptive_bool_names`](#prefer_descriptive_bool_names)
+  - [`prefer_fixme_format`](#prefer_fixme_format)
+  - [`prefer_inline_callbacks`](#prefer_inline_callbacks)
+  - [`prefer_one_widget_per_file`](#prefer_one_widget_per_file)
+  - [`prefer_private_underscore_prefix`](#prefer_private_underscore_prefix)
+  - [`prefer_rethrow_over_throw_e`](#prefer_rethrow_over_throw_e)
+  - [`prefer_snake_case_files`](#prefer_snake_case_files)
+  - [`prefer_sorted_parameters`](#prefer_sorted_parameters)
+  - [`prefer_todo_format`](#prefer_todo_format)
+  - [`prefer_widget_methods_over_classes`](#prefer_widget_methods_over_classes)
+  - [`avoid_generic_greeting_text`](#avoid_generic_greeting_text)
+  - [`firebase_custom`](#firebase_custom)
+  - [`prefer_kebab_tag_name`](#prefer_kebab_tag_name)
+  - [`purchase_completed`](#purchase_completed)
+  - [`require_purchase_verification`](#require_purchase_verification)
+  - [`require_save_confirmation`](#require_save_confirmation)
+  - [`user_clicked_button`](#user_clicked_button)
+- [Widget 偏好](#widget-偏好)
+  - [`prefer_container_over_sizedbox`](#prefer_container_over_sizedbox)
+  - [`prefer_edgeinsets_only`](#prefer_edgeinsets_only)
+  - [`prefer_edgeinsets_symmetric`](#prefer_edgeinsets_symmetric)
+  - [`prefer_expanded_over_flexible`](#prefer_expanded_over_flexible)
+  - [`prefer_explicit_colors`](#prefer_explicit_colors)
+  - [`prefer_flexible_over_expanded`](#prefer_flexible_over_expanded)
+  - [`prefer_material_theme_colors`](#prefer_material_theme_colors)
+  - [`prefer_richtext_over_text_rich`](#prefer_richtext_over_text_rich)
+  - [`prefer_sizedbox_over_container`](#prefer_sizedbox_over_container)
+  - [`prefer_text_rich_over_richtext`](#prefer_text_rich_over_richtext)
+  - [`prefer_borderradius_circular`](#prefer_borderradius_circular)
+  - [`prefer_clip_r_superellipse`](#prefer_clip_r_superellipse)
+  - [`prefer_clip_r_superellipse_clipper`](#prefer_clip_r_superellipse_clipper)
+- [空值与集合处理](#空值与集合处理)
+  - [`prefer_addall_over_spread`](#prefer_addall_over_spread)
+  - [`prefer_spread_over_addall`](#prefer_spread_over_addall)
+- [控制流与异步](#控制流与异步)
+  - [`prefer_switch_expression`](#prefer_switch_expression)
+  - [`prefer_switch_statement`](#prefer_switch_statement)
+- [空行与构造函数](#空行与构造函数)
+  - [`prefer_blank_line_before_return`](#prefer_blank_line_before_return)
+  - [`prefer_no_blank_line_before_return`](#prefer_no_blank_line_before_return)
+- [异常处理与测试](#异常处理与测试)
+  - [`prefer_catch_over_on`](#prefer_catch_over_on)
+  - [`prefer_error_suffix`](#prefer_error_suffix)
+  - [`prefer_exception_suffix`](#prefer_exception_suffix)
+  - [`prefer_generic_exception`](#prefer_generic_exception)
+  - [`prefer_given_when_then_comments`](#prefer_given_when_then_comments)
+  - [`prefer_grouped_expectations`](#prefer_grouped_expectations)
+  - [`prefer_on_over_catch`](#prefer_on_over_catch)
+  - [`prefer_self_documenting_tests`](#prefer_self_documenting_tests)
+  - [`prefer_single_expectation_per_test`](#prefer_single_expectation_per_test)
+  - [`prefer_specific_exceptions`](#prefer_specific_exceptions)
+  - [`prefer_test_name_descriptive`](#prefer_test_name_descriptive)
+  - [`prefer_test_name_should_when`](#prefer_test_name_should_when)
+  - [`prefer_expect_over_assert_in_tests`](#prefer_expect_over_assert_in_tests)
+- [附加风格规则 / 字符串处理](#附加风格规则-字符串处理)
+  - [`prefer_concatenation_over_interpolation`](#prefer_concatenation_over_interpolation)
+  - [`prefer_double_quotes`](#prefer_double_quotes)
+  - [`prefer_interpolation_over_concatenation`](#prefer_interpolation_over_concatenation)
+- [附加风格规则 / 导入组织](#附加风格规则-导入组织)
+  - [`prefer_absolute_imports`](#prefer_absolute_imports)
+  - [`prefer_flat_imports`](#prefer_flat_imports)
+  - [`prefer_grouped_imports`](#prefer_grouped_imports)
+  - [`prefer_relative_imports`](#prefer_relative_imports)
+  - [`prefer_named_imports`](#prefer_named_imports)
+- [附加风格规则 / 类结构](#附加风格规则-类结构)
+  - [`prefer_fields_before_methods`](#prefer_fields_before_methods)
+  - [`prefer_instance_members_first`](#prefer_instance_members_first)
+  - [`prefer_methods_before_fields`](#prefer_methods_before_fields)
+  - [`prefer_private_members_first`](#prefer_private_members_first)
+  - [`prefer_public_members_first`](#prefer_public_members_first)
+  - [`prefer_static_members_first`](#prefer_static_members_first)
+- [附加风格规则 / 类型标注](#附加风格规则-类型标注)
+  - [`prefer_dynamic_over_object`](#prefer_dynamic_over_object)
+  - [`prefer_object_over_dynamic`](#prefer_object_over_dynamic)
+- [附加风格规则 / 命名约定](#附加风格规则-命名约定)
+  - [`prefer_lower_camel_case_constants`](#prefer_lower_camel_case_constants)
+  - [`prefer_camel_case_method_names`](#prefer_camel_case_method_names)
+- [附加风格规则 / 表达式风格](#附加风格规则-表达式风格)
+  - [`prefer_explicit_boolean_comparison`](#prefer_explicit_boolean_comparison)
+  - [`prefer_implicit_boolean_comparison`](#prefer_implicit_boolean_comparison)
+  - [`prefer_explicit_this`](#prefer_explicit_this)
+
+## 二选一冲突规则
+
+| 分类 | 方案 A | 方案 B | 中文释义 | 取舍点 | 示例 | 会议结论 | 备注 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Widget 偏好 | [`prefer_container_over_sizedbox`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_container_over_sizedbox) | [`prefer_sizedbox_over_container`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_sizedbox_over_container) | A：简单布局场景也优先统一使用 `Container`。<br />B：简单尺寸占位优先使用 `SizedBox`。 | Prefer Container for consistency / Use SizedBox for simple sizing | `BAD:` SizedBox(width: 100, height: 50)<br />`GOOD:` Container(width: 100, height: 50) | 待定 |  |
+| Widget 偏好 | [`prefer_edgeinsets_only`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_edgeinsets_only) | [`prefer_edgeinsets_symmetric`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_edgeinsets_symmetric) | A：边距优先显式写成 `EdgeInsets.only`。<br />B：对称边距优先使用 `EdgeInsets.symmetric`。 | Use EdgeInsets.only for explicit values / Use EdgeInsets.symmetric when applicable | — | 待定 |  |
+| Widget 偏好 | [`prefer_expanded_over_flexible`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_expanded_over_flexible) | [`prefer_flexible_over_expanded`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_flexible_over_expanded) | A：等分拉伸场景优先使用 `Expanded`。<br />B：拉伸布局优先使用 `Flexible` 表达控制意图。 | Use Expanded instead of Flexible(flex: 1) / Prefer Flexible for explicit control | — | 待定 |  |
+| Widget 偏好 | [`prefer_explicit_colors`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_explicit_colors) | [`prefer_material_theme_colors`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_material_theme_colors) | A：颜色优先直接显式指定。<br />B：颜色优先从主题中读取。 | Use explicit color values / Use Theme.of(context) colors | — | 待定 |  |
+| Widget 偏好 | [`prefer_richtext_over_text_rich`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_richtext_over_text_rich) | [`prefer_text_rich_over_richtext`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_text_rich_over_richtext) | A：富文本优先直接使用 `RichText`。<br />B：富文本优先使用 `Text.rich`。 | Use RichText over Text.rich / Use Text.rich over RichText widget | — | 待定 |  |
+| 异常处理与测试 | [`prefer_catch_over_on`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_catch_over_on) | [`prefer_on_over_catch`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_on_over_catch) | A：try-catch 优先使用裸 `catch (e)`。<br />B：try-catch 优先使用 `on 类型` 形式。 | Use bare `catch (e)` / Use `on ExceptionType` in try-catch | — | 待定 |  |
+| 异常处理与测试 | [`prefer_error_suffix`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_error_suffix) | [`prefer_exception_suffix`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_exception_suffix) | A：异常类命名以 `Error` 结尾。<br />B：异常类命名以 `Exception` 结尾。 | Exception classes end with "Error" / Exception classes end with "Exception" | — | 待定 |  |
+| 异常处理与测试 | [`prefer_generic_exception`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_generic_exception) | [`prefer_specific_exceptions`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_specific_exceptions) | A：抛错时统一使用通用 `Exception`。<br />B：抛错时优先使用具体异常类型。 | Use generic Exception class / Throw specific exception types | — | 待定 |  |
+| 异常处理与测试 | [`prefer_given_when_then_comments`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_given_when_then_comments) | [`prefer_self_documenting_tests`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_self_documenting_tests) | A：测试中使用 Arrange/Act/Assert 或 Given/When/Then 注释。<br />B：测试代码依靠命名和结构自解释，不额外写结构注释。 | Use AAA/GWT comments in tests / No structure comments in tests | `BAD:` test('user login', () { final user = User('test@example.com'); final result = authService.login(user); expe...<br />`GOOD:` test('user login', () { // Arrange ... // Act ... // Assert ... }) | 待定 |  |
+| 异常处理与测试 | [`prefer_grouped_expectations`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_grouped_expectations) | [`prefer_single_expectation_per_test`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_single_expectation_per_test) | A：相关断言允许集中写在一个测试里。<br />B：每个测试尽量只保留一个断言目标。 | Group related assertions / One assertion per test | — | 待定 |  |
+| 异常处理与测试 | [`prefer_test_name_descriptive`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_test_name_descriptive) | [`prefer_test_name_should_when`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_test_name_should_when) | A：测试名采用自然描述式命名。<br />B：测试名采用 `should ... when ...` 句式。 | Descriptive test names / Test names: "should X when Y" | — | 待定 |  |
+| 控制流与异步 | [`prefer_switch_expression`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_switch_expression) | [`prefer_switch_statement`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_switch_statement) | A：分支表达优先使用 switch expression。<br />B：分支表达优先使用传统 switch statement。 | Use switch expressions (Dart 3) / Use switch statements | — | 待定 |  |
+| 空值与集合处理 | [`prefer_addall_over_spread`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_addall_over_spread) | [`prefer_spread_over_addall`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_spread_over_addall) | A：集合追加元素优先使用 `addAll()`。<br />B：集合拼接优先使用展开运算符 `...`。 | Use addAll method / Use `...` spread operator | — | 待定 |  |
+| 空行与构造函数 | [`prefer_blank_line_before_return`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_blank_line_before_return) | [`prefer_no_blank_line_before_return`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_no_blank_line_before_return) | A：return 前保留一行空行。<br />B：return 前不额外插入空行。 | Blank line before return statements / No blank line before return | — | 待定 |  |
+| 附加风格规则 / 命名约定 | [`prefer_lower_camel_case_constants`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_lower_camel_case_constants) | [`prefer_screaming_case_constants`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_screaming_case_constants) | A：常量采用 `lowerCamelCase` 命名。<br />B：常量使用全大写下划线命名。 | Constants: `maxRetries` / Constants in `SCREAMING_SNAKE_CASE` | `BAD:` const int maxRetries = 3;<br />`GOOD:` const int MAX_RETRIES = 3; | 待定 |  |
+| 附加风格规则 / 字符串处理 | [`prefer_concatenation_over_interpolation`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_concatenation_over_interpolation) | [`prefer_interpolation_over_concatenation`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_interpolation_over_concatenation) | A：字符串拼接优先使用 `+` 连接。<br />B：字符串拼接优先使用插值。 | Use `'Hello, ' + name` / Use `'Hello, $name'` | — | 待定 |  |
+| 附加风格规则 / 字符串处理 | [`prefer_double_quotes`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_double_quotes) | [`prefer_single_quotes`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_single_quotes) | A：字符串默认使用双引号。<br />B：字符串默认使用单引号。 | Use double quotes for strings / Single quotes `'string'` instead of double quotes | `BAD:` String name = "John";<br />`GOOD:` String name = 'John'; | 待定 |  |
+| 附加风格规则 / 导入组织 | [`prefer_absolute_imports`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_absolute_imports) | [`prefer_relative_imports`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_relative_imports) | A：导入本地包内文件优先使用 `package:` 路径。<br />B：同包内文件优先使用相对导入。 | Use `package:` imports / Use relative imports for local files | `BAD:` import 'package:my_app/src/utils/helpers.dart';<br />`GOOD:` import '../utils/helpers.dart'; | 待定 |  |
+| 附加风格规则 / 导入组织 | [`prefer_flat_imports`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_flat_imports) | [`prefer_grouped_imports`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_grouped_imports) | A：导入列表保持扁平，不做分组。<br />B：导入按 `dart / package / relative` 分组。 | No grouping, flat import list / Group: dart, package, relative | — | 待定 |  |
+| 附加风格规则 / 类型标注 | [`prefer_dynamic_over_object`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_dynamic_over_object) | [`prefer_object_over_dynamic`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_object_over_dynamic) | A：确实需要动态行为时优先直接使用 `dynamic`。<br />B：动态场景优先使用 `Object?` 而不是 `dynamic`。 | Use `dynamic` for truly dynamic types / Use `Object?` instead of `dynamic` | — | 待定 |  |
+| 附加风格规则 / 类结构 | [`prefer_fields_before_methods`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_fields_before_methods) | [`prefer_methods_before_fields`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_methods_before_fields) | A：类中字段定义放在方法前面。<br />B：类中方法定义放在字段前面。 | Fields declared before methods / Methods declared before fields | — | 待定 |  |
+| 附加风格规则 / 类结构 | [`prefer_instance_members_first`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_instance_members_first) | [`prefer_static_members_first`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_static_members_first) | A：实例成员放在静态成员前面。<br />B：静态成员放在实例成员前面。 | Instance members before static / Static members before instance | — | 待定 |  |
+| 附加风格规则 / 类结构 | [`prefer_private_members_first`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_private_members_first) | [`prefer_public_members_first`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_public_members_first) | A：私有成员放在公开成员前面。<br />B：公开成员放在私有成员前面。 | Private members before public / Public members before private | — | 待定 |  |
+| 附加风格规则 / 表达式风格 | [`prefer_explicit_boolean_comparison`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_explicit_boolean_comparison) | [`prefer_implicit_boolean_comparison`](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_implicit_boolean_comparison) | A：布尔判断显式写成与 `true/false` 的比较。<br />B：布尔判断优先直接写 `if (flag)`。 | Use `if (isValid == true)` for nullable bools / Use `if (isValid)` not `if (isValid == true)` | — | 待定 |  |
+
+## 通用风格规则
+
+本分类共 `34` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`arguments_ordering`
+
+- 中文释义：命名参数按字母顺序排列。
+- 上游说明：Named arguments should be in alphabetical order
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#arguments_ordering)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`avoid_small_text`
+
+- 中文释义：文本字号避免小于 12，兼顾可访问性。
+- 上游说明：Font size at least 12 for accessibility
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#avoid_small_text)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+Text('Small', style: TextStyle(fontSize: 10));
+```
+
+**GOOD**
+
+```dart
+Text('Readable', style: TextStyle(fontSize: 14));
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`capitalize_comment`
+
+- 中文释义：注释以大写字母开头。
+- 上游说明：Comments should start with a capital letter
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#capitalize_comment)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_arrow_functions`
+
+- 中文释义：单返回表达式函数优先使用箭头语法。
+- 上游说明：Use `=>` arrow syntax for single-return functions
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_arrow_functions)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+int double(int x) {
+  return x * 2;
+}
+```
+
+**GOOD**
+
+```dart
+int double(int x) => x * 2;
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_curly_apostrophe`
+
+- 中文释义：字符串中的撇号优先使用弯引号。
+- 上游说明：Curly apostrophe `'` in strings
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_curly_apostrophe)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+String message = "It's a beautiful day";  // Straight apostrophe U+0027
+```
+
+**GOOD**
+
+```dart
+String message = "It's a beautiful day";  // Curly apostrophe U+2019
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_doc_comments_over_regular`
+
+- 中文释义：公开 API 说明优先使用 `///` 文档注释。
+- 上游说明：Use `///` instead of `//` for public API docs
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_doc_comments_over_regular)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_doc_curly_apostrophe`
+
+- 中文释义：文档注释中的撇号优先使用弯引号。
+- 上游说明：Curly apostrophe `'` in doc comments
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_doc_curly_apostrophe)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+/// It's a beautiful day.  // Straight apostrophe
+```
+
+**GOOD**
+
+```dart
+/// It's a beautiful day.  // Curly apostrophe
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_doc_straight_apostrophe`
+
+- 中文释义：文档注释中的撇号优先使用直引号。
+- 上游说明：Straight apostrophe `'` in doc comments
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_doc_straight_apostrophe)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+/// It's a beautiful day.  // Curly apostrophe U+2019
+```
+
+**GOOD**
+
+```dart
+/// It's a beautiful day.  // Straight apostrophe U+0027
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_period_after_doc`
+
+- 中文释义：文档注释结尾补句号。
+- 上游说明：Doc comments end with period
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_period_after_doc)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_relative_imports`
+
+- 中文释义：同包内文件优先使用相对导入。
+- 上游说明：Use relative imports instead of absolute `package:` imports
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_relative_imports)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+import 'package:my_app/src/utils/helpers.dart';
+```
+
+**GOOD**
+
+```dart
+import '../utils/helpers.dart';
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_screaming_case_constants`
+
+- 中文释义：常量使用全大写下划线命名。
+- 上游说明：Constants in `SCREAMING_SNAKE_CASE`
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_screaming_case_constants)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+const int maxRetries = 3;
+```
+
+**GOOD**
+
+```dart
+const int MAX_RETRIES = 3;
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_sentence_case_comments`
+
+- 中文释义：普通注释以句首大写风格书写。
+- 上游说明：Comments start with capital letter
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_sentence_case_comments)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_single_quotes`
+
+- 中文释义：字符串默认使用单引号。
+- 上游说明：Single quotes `'string'` instead of double quotes
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_single_quotes)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+String name = "John";
+```
+
+**GOOD**
+
+```dart
+String name = 'John';
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_straight_apostrophe`
+
+- 中文释义：字符串中的撇号优先使用直引号。
+- 上游说明：Straight apostrophe `'` in strings
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_straight_apostrophe)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+String message = "It's a beautiful day";  // Curly apostrophe U+2019
+```
+
+**GOOD**
+
+```dart
+String message = "It's a beautiful day";  // Straight apostrophe U+0027
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(29, 78, 216, 0.24)", background: "rgba(59, 130, 246, 0.14)", color: "#1d4ed8", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>低成本候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_trailing_comma_always`
+
+- 中文释义：多行结构统一保留尾随逗号。
+- 上游说明：Trailing commas on all multi-line constructs
+- 初筛分组：低成本候选
+- 建议讨论方式：可先在分支试运行，再决定是否正式采纳。
+- 快速修复：是
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_trailing_comma_always)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+return Container(
+  child: Text('Hello')  // Missing trailing comma
+);
+```
+
+**GOOD**
+
+```dart
+return Container(
+  child: Text('Hello'),
+);
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_all_named_parameters`
+
+- 中文释义：当位置参数较多时，优先改为命名参数。
+- 上游说明：Use named parameters when 3+ positional params
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_all_named_parameters)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+void createUser(String name, String email, int age, bool isAdmin) { ... }
+createUser('John', 'john@example.com', 30, true);  // Unclear
+```
+
+**GOOD**
+
+```dart
+void createUser({
+  required String name,
+  required String email,
+  required int age,
+  required bool isAdmin,
+}) { ... }
+createUser(name: 'John', email: 'john@example.com', age: 30, isAdmin: true);
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_class_over_record_return`
+
+- 中文释义：方法返回值优先用类而不是 record。
+- 上游说明：Return classes instead of records from methods
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_class_over_record_return)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_descriptive_bool_names`
+
+- 中文释义：布尔命名使用 `is/has/can` 等语义前缀。
+- 上游说明：Booleans use `is`/`has`/`can` prefix
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_descriptive_bool_names)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+bool admin = true;
+```
+
+**GOOD**
+
+```dart
+bool isAdmin = true;
+bool hasPermission = true;
+bool canEdit = true;
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_fixme_format`
+
+- 中文释义：FIXME 注释统一采用 `FIXME(author): 描述` 格式。
+- 上游说明：FIXMEs follow `FIXME(author): description` format
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_fixme_format)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_inline_callbacks`
+
+- 中文释义：回调优先内联编写，不额外提取方法引用。
+- 上游说明：Inline callbacks instead of method references
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_inline_callbacks)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_one_widget_per_file`
+
+- 中文释义：每个文件尽量只放一个 Widget 类。
+- 上游说明：One widget class per file
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_one_widget_per_file)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+// my_widgets.dart
+class MyButton extends StatelessWidget { ... }
+class MyCard extends StatelessWidget { ... }  // Second widget triggers warning
+```
+
+**GOOD**
+
+```dart
+// my_button.dart
+class MyButton extends StatelessWidget { ... }
+// my_card.dart (separate file)
+class MyCard extends StatelessWidget { ... }
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_private_underscore_prefix`
+
+- 中文释义：实例字段默认使用下划线私有化。
+- 上游说明：All instance fields should be private (`_name`)
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_private_underscore_prefix)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_rethrow_over_throw_e`
+
+- 中文释义：在 catch 中优先使用 `rethrow`，避免 `throw e`。
+- 上游说明：Prefer 'rethrow' over 'throw e' in catch blocks
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_rethrow_over_throw_e)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_snake_case_files`
+
+- 中文释义：文件名统一使用 `snake_case.dart`。
+- 上游说明：File names in `snake_case.dart`
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_snake_case_files)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_sorted_parameters`
+
+- 中文释义：函数参数顺序遵守团队约定。
+- 上游说明：Function parameters should be sorted by team convention
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_sorted_parameters)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_todo_format`
+
+- 中文释义：TODO 注释统一采用 `TODO(author): 描述` 格式。
+- 上游说明：TODOs follow `TODO(author): description` format
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_todo_format)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_widget_methods_over_classes`
+
+- 中文释义：小型 Widget 优先写成方法而不是单独类。
+- 上游说明：Small widgets as methods instead of classes
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_widget_methods_over_classes)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>项目/业务相关</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`avoid_generic_greeting_text`
+
+- 中文释义：问候语文案遵守团队统一风格。
+- 上游说明：Greeting messages should follow team style conventions
+- 初筛分组：项目/业务相关
+- 建议讨论方式：结合现有业务模块、团队习惯和适用范围讨论。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#avoid_generic_greeting_text)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>项目/业务相关</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`firebase_custom`
+
+- 中文释义：Firebase 相关写法遵守团队自定义约定。
+- 上游说明：Custom Firebase usage should follow team conventions
+- 初筛分组：项目/业务相关
+- 建议讨论方式：结合现有业务模块、团队习惯和适用范围讨论。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#firebase_custom)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>项目/业务相关</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_kebab_tag_name`
+
+- 中文释义：标签名统一使用 kebab-case。
+- 上游说明：Tag names should use kebab-case
+- 初筛分组：项目/业务相关
+- 建议讨论方式：结合现有业务模块、团队习惯和适用范围讨论。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_kebab_tag_name)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>项目/业务相关</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`purchase_completed`
+
+- 中文释义：购买完成逻辑遵守团队既定写法。
+- 上游说明：Purchase completion logic should follow team style conventions
+- 初筛分组：项目/业务相关
+- 建议讨论方式：结合现有业务模块、团队习惯和适用范围讨论。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#purchase_completed)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>项目/业务相关</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`require_purchase_verification`
+
+- 中文释义：购买流程需遵守校验相关团队约定。
+- 上游说明：Purchase logic should follow team style conventions
+- 初筛分组：项目/业务相关
+- 建议讨论方式：结合现有业务模块、团队习惯和适用范围讨论。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#require_purchase_verification)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>项目/业务相关</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`require_save_confirmation`
+
+- 中文释义：保存行为需要符合确认流程约定。
+- 上游说明：Save logic should follow team style conventions
+- 初筛分组：项目/业务相关
+- 建议讨论方式：结合现有业务模块、团队习惯和适用范围讨论。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#require_save_confirmation)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(180, 83, 9, 0.24)", background: "rgba(245, 158, 11, 0.18)", color: "#b45309", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>项目/业务相关</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`user_clicked_button`
+
+- 中文释义：按钮点击逻辑遵守团队交互约定。
+- 上游说明：Button click logic should follow team style conventions
+- 初筛分组：项目/业务相关
+- 建议讨论方式：结合现有业务模块、团队习惯和适用范围讨论。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#user_clicked_button)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+
+## Widget 偏好
+
+本分类共 `13` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_container_over_sizedbox`
+
+- 中文释义：简单布局场景也优先统一使用 `Container`。
+- 上游说明：Prefer Container for consistency
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_sizedbox_over_container`](#prefer_sizedbox_over_container)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_container_over_sizedbox)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+SizedBox(width: 100, height: 50)
+```
+
+**GOOD**
+
+```dart
+Container(width: 100, height: 50)
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_edgeinsets_only`
+
+- 中文释义：边距优先显式写成 `EdgeInsets.only`。
+- 上游说明：Use EdgeInsets.only for explicit values
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_edgeinsets_symmetric`](#prefer_edgeinsets_symmetric)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_edgeinsets_only)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_edgeinsets_symmetric`
+
+- 中文释义：对称边距优先使用 `EdgeInsets.symmetric`。
+- 上游说明：Use EdgeInsets.symmetric when applicable
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_edgeinsets_only`](#prefer_edgeinsets_only)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_edgeinsets_symmetric)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_expanded_over_flexible`
+
+- 中文释义：等分拉伸场景优先使用 `Expanded`。
+- 上游说明：Use Expanded instead of Flexible(flex: 1)
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_flexible_over_expanded`](#prefer_flexible_over_expanded)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_expanded_over_flexible)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_explicit_colors`
+
+- 中文释义：颜色优先直接显式指定。
+- 上游说明：Use explicit color values
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_material_theme_colors`](#prefer_material_theme_colors)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_explicit_colors)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_flexible_over_expanded`
+
+- 中文释义：拉伸布局优先使用 `Flexible` 表达控制意图。
+- 上游说明：Prefer Flexible for explicit control
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_expanded_over_flexible`](#prefer_expanded_over_flexible)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_flexible_over_expanded)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_material_theme_colors`
+
+- 中文释义：颜色优先从主题中读取。
+- 上游说明：Use Theme.of(context) colors
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_explicit_colors`](#prefer_explicit_colors)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_material_theme_colors)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_richtext_over_text_rich`
+
+- 中文释义：富文本优先直接使用 `RichText`。
+- 上游说明：Use RichText over Text.rich
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_text_rich_over_richtext`](#prefer_text_rich_over_richtext)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_richtext_over_text_rich)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_sizedbox_over_container`
+
+- 中文释义：简单尺寸占位优先使用 `SizedBox`。
+- 上游说明：Use SizedBox for simple sizing
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_container_over_sizedbox`](#prefer_container_over_sizedbox)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_sizedbox_over_container)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+Container(width: 100, height: 50)
+```
+
+**GOOD**
+
+```dart
+SizedBox(width: 100, height: 50)
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_text_rich_over_richtext`
+
+- 中文释义：富文本优先使用 `Text.rich`。
+- 上游说明：Use Text.rich over RichText widget
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_richtext_over_text_rich`](#prefer_richtext_over_text_rich)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_text_rich_over_richtext)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_borderradius_circular`
+
+- 中文释义：统一圆角优先使用 `BorderRadius.circular`。
+- 上游说明：Use BorderRadius.circular for uniform corners
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_borderradius_circular)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(15, 118, 110, 0.24)", background: "rgba(20, 184, 166, 0.14)", color: "#0f766e", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>版本前提</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_clip_r_superellipse`
+
+- 中文释义：圆角裁剪优先使用 `ClipRSuperellipse`。
+- 上游说明：Use ClipRSuperellipse over ClipRRect (quick fix)
+- 初筛分组：版本前提
+- 建议讨论方式：先确认 Flutter 或 SDK 版本，再决定是否纳入候选。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_clip_r_superellipse)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network('url'))
+```
+
+**GOOD**
+
+```dart
+ClipRSuperellipse(borderRadius: BorderRadius.circular(10), child: Image.network('url'))
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(15, 118, 110, 0.24)", background: "rgba(20, 184, 166, 0.14)", color: "#0f766e", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>版本前提</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_clip_r_superellipse_clipper`
+
+- 中文释义：带自定义裁剪时也优先使用 `ClipRSuperellipse`。
+- 上游说明：Use ClipRSuperellipse over ClipRRect with custom clipper
+- 初筛分组：版本前提
+- 建议讨论方式：先确认 Flutter 或 SDK 版本，再决定是否纳入候选。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_clip_r_superellipse_clipper)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network('url'))
+```
+
+**GOOD**
+
+```dart
+ClipRSuperellipse(borderRadius: BorderRadius.circular(10), child: Image.network('url'))
+```
+
+
+## 空值与集合处理
+
+本分类共 `2` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_addall_over_spread`
+
+- 中文释义：集合追加元素优先使用 `addAll()`。
+- 上游说明：Use addAll method
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_spread_over_addall`](#prefer_spread_over_addall)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_addall_over_spread)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_spread_over_addall`
+
+- 中文释义：集合拼接优先使用展开运算符 `...`。
+- 上游说明：Use `...` spread operator
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_addall_over_spread`](#prefer_addall_over_spread)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_spread_over_addall)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+
+## 控制流与异步
+
+本分类共 `2` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_switch_expression`
+
+- 中文释义：分支表达优先使用 switch expression。
+- 上游说明：Use switch expressions (Dart 3)
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_switch_statement`](#prefer_switch_statement)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_switch_expression)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_switch_statement`
+
+- 中文释义：分支表达优先使用传统 switch statement。
+- 上游说明：Use switch statements
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_switch_expression`](#prefer_switch_expression)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_switch_statement)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+
+## 空行与构造函数
+
+本分类共 `2` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_blank_line_before_return`
+
+- 中文释义：return 前保留一行空行。
+- 上游说明：Blank line before return statements
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_no_blank_line_before_return`](#prefer_no_blank_line_before_return)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_blank_line_before_return)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_no_blank_line_before_return`
+
+- 中文释义：return 前不额外插入空行。
+- 上游说明：No blank line before return
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_blank_line_before_return`](#prefer_blank_line_before_return)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_no_blank_line_before_return)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+
+## 异常处理与测试
+
+本分类共 `13` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_catch_over_on`
+
+- 中文释义：try-catch 优先使用裸 `catch (e)`。
+- 上游说明：Use bare `catch (e)`
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_on_over_catch`](#prefer_on_over_catch)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_catch_over_on)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_error_suffix`
+
+- 中文释义：异常类命名以 `Error` 结尾。
+- 上游说明：Exception classes end with "Error"
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_exception_suffix`](#prefer_exception_suffix)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_error_suffix)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_exception_suffix`
+
+- 中文释义：异常类命名以 `Exception` 结尾。
+- 上游说明：Exception classes end with "Exception"
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_error_suffix`](#prefer_error_suffix)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_exception_suffix)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_generic_exception`
+
+- 中文释义：抛错时统一使用通用 `Exception`。
+- 上游说明：Use generic Exception class
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_specific_exceptions`](#prefer_specific_exceptions)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_generic_exception)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_given_when_then_comments`
+
+- 中文释义：测试中使用 Arrange/Act/Assert 或 Given/When/Then 注释。
+- 上游说明：Use AAA/GWT comments in tests
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_self_documenting_tests`](#prefer_self_documenting_tests)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_given_when_then_comments)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+test('user login', () { final user = User('test@example.com'); final result = authService.login(user); expect(result.isSuccess, true); })
+```
+
+**GOOD**
+
+```dart
+test('user login', () { // Arrange ... // Act ... // Assert ... })
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_grouped_expectations`
+
+- 中文释义：相关断言允许集中写在一个测试里。
+- 上游说明：Group related assertions
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_single_expectation_per_test`](#prefer_single_expectation_per_test)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_grouped_expectations)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_on_over_catch`
+
+- 中文释义：try-catch 优先使用 `on 类型` 形式。
+- 上游说明：Use `on ExceptionType` in try-catch
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_catch_over_on`](#prefer_catch_over_on)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_on_over_catch)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_self_documenting_tests`
+
+- 中文释义：测试代码依靠命名和结构自解释，不额外写结构注释。
+- 上游说明：No structure comments in tests
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_given_when_then_comments`](#prefer_given_when_then_comments)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_self_documenting_tests)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+test('user login', () { // Arrange ... // Act ... // Assert ... })
+```
+
+**GOOD**
+
+```dart
+test('user login', () { final user = User('test@example.com'); final result = authService.login(user); expect(result.isSuccess, true); })
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_single_expectation_per_test`
+
+- 中文释义：每个测试尽量只保留一个断言目标。
+- 上游说明：One assertion per test
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_grouped_expectations`](#prefer_grouped_expectations)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_single_expectation_per_test)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_specific_exceptions`
+
+- 中文释义：抛错时优先使用具体异常类型。
+- 上游说明：Throw specific exception types
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_generic_exception`](#prefer_generic_exception)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_specific_exceptions)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_test_name_descriptive`
+
+- 中文释义：测试名采用自然描述式命名。
+- 上游说明：Descriptive test names
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_test_name_should_when`](#prefer_test_name_should_when)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_test_name_descriptive)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_test_name_should_when`
+
+- 中文释义：测试名采用 `should ... when ...` 句式。
+- 上游说明：Test names: "should X when Y"
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_test_name_descriptive`](#prefer_test_name_descriptive)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_test_name_should_when)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_expect_over_assert_in_tests`
+
+- 中文释义：测试断言优先使用 `expect()`。
+- 上游说明：Use expect() instead of assert()
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_expect_over_assert_in_tests)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+
+## 附加风格规则 / 字符串处理
+
+本分类共 `3` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_concatenation_over_interpolation`
+
+- 中文释义：字符串拼接优先使用 `+` 连接。
+- 上游说明：Use `'Hello, ' + name`
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_interpolation_over_concatenation`](#prefer_interpolation_over_concatenation)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_concatenation_over_interpolation)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_double_quotes`
+
+- 中文释义：字符串默认使用双引号。
+- 上游说明：Use double quotes for strings
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_single_quotes`](#prefer_single_quotes)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_double_quotes)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_interpolation_over_concatenation`
+
+- 中文释义：字符串拼接优先使用插值。
+- 上游说明：Use `'Hello, $name'`
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_concatenation_over_interpolation`](#prefer_concatenation_over_interpolation)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_interpolation_over_concatenation)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+
+## 附加风格规则 / 导入组织
+
+本分类共 `5` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_absolute_imports`
+
+- 中文释义：导入本地包内文件优先使用 `package:` 路径。
+- 上游说明：Use `package:` imports
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_relative_imports`](#prefer_relative_imports)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_absolute_imports)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_flat_imports`
+
+- 中文释义：导入列表保持扁平，不做分组。
+- 上游说明：No grouping, flat import list
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_grouped_imports`](#prefer_grouped_imports)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_flat_imports)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_grouped_imports`
+
+- 中文释义：导入按 `dart / package / relative` 分组。
+- 上游说明：Group: dart, package, relative
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_flat_imports`](#prefer_flat_imports)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_grouped_imports)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_relative_imports`
+
+- 中文释义：同包内文件优先使用相对导入。
+- 上游说明：Use relative imports for local files
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_absolute_imports`](#prefer_absolute_imports)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_relative_imports)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+**示例**
+
+**BAD**
+
+```dart
+import 'package:my_app/src/utils/helpers.dart';
+```
+
+**GOOD**
+
+```dart
+import '../utils/helpers.dart';
+```
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_named_imports`
+
+- 中文释义：导入时优先使用 `show` / `hide` 明确暴露内容。
+- 上游说明：Use `show`/`hide` for explicit imports
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_named_imports)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+
+## 附加风格规则 / 类结构
+
+本分类共 `6` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_fields_before_methods`
+
+- 中文释义：类中字段定义放在方法前面。
+- 上游说明：Fields declared before methods
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_methods_before_fields`](#prefer_methods_before_fields)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_fields_before_methods)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_instance_members_first`
+
+- 中文释义：实例成员放在静态成员前面。
+- 上游说明：Instance members before static
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_static_members_first`](#prefer_static_members_first)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_instance_members_first)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_methods_before_fields`
+
+- 中文释义：类中方法定义放在字段前面。
+- 上游说明：Methods declared before fields
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_fields_before_methods`](#prefer_fields_before_methods)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_methods_before_fields)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_private_members_first`
+
+- 中文释义：私有成员放在公开成员前面。
+- 上游说明：Private members before public
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_public_members_first`](#prefer_public_members_first)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_private_members_first)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_public_members_first`
+
+- 中文释义：公开成员放在私有成员前面。
+- 上游说明：Public members before private
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_private_members_first`](#prefer_private_members_first)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_public_members_first)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_static_members_first`
+
+- 中文释义：静态成员放在实例成员前面。
+- 上游说明：Static members before instance
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_instance_members_first`](#prefer_instance_members_first)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_static_members_first)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+
+## 附加风格规则 / 类型标注
+
+本分类共 `2` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_dynamic_over_object`
+
+- 中文释义：确实需要动态行为时优先直接使用 `dynamic`。
+- 上游说明：Use `dynamic` for truly dynamic types
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_object_over_dynamic`](#prefer_object_over_dynamic)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_dynamic_over_object)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_object_over_dynamic`
+
+- 中文释义：动态场景优先使用 `Object?` 而不是 `dynamic`。
+- 上游说明：Use `Object?` instead of `dynamic`
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_dynamic_over_object`](#prefer_dynamic_over_object)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_object_over_dynamic)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+
+## 附加风格规则 / 命名约定
+
+本分类共 `2` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_lower_camel_case_constants`
+
+- 中文释义：常量采用 `lowerCamelCase` 命名。
+- 上游说明：Constants: `maxRetries`
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_screaming_case_constants`](#prefer_screaming_case_constants)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_lower_camel_case_constants)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_camel_case_method_names`
+
+- 中文释义：方法名统一使用 `camelCase`。
+- 上游说明：Methods: `fetchUserData`
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_camel_case_method_names)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+
+## 附加风格规则 / 表达式风格
+
+本分类共 `3` 条规则，建议按 `二选一 -> 低成本候选 -> 其他` 的顺序讨论。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_explicit_boolean_comparison`
+
+- 中文释义：布尔判断显式写成与 `true/false` 的比较。
+- 上游说明：Use `if (isValid == true)` for nullable bools
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_implicit_boolean_comparison`](#prefer_implicit_boolean_comparison)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_explicit_boolean_comparison)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(185, 28, 28, 0.24)", background: "rgba(239, 68, 68, 0.14)", color: "#b91c1c", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>二选一</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_implicit_boolean_comparison`
+
+- 中文释义：布尔判断优先直接写 `if (flag)`。
+- 上游说明：Use `if (isValid)` not `if (isValid == true)`
+- 初筛分组：二选一
+- 建议讨论方式：放入会议投票，必须和对立规则一起决策。
+- 快速修复：否
+- 对立规则：[`prefer_explicit_boolean_comparison`](#prefer_explicit_boolean_comparison)
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_implicit_boolean_comparison)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+### <span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(21, 128, 61, 0.24)", background: "rgba(34, 197, 94, 0.14)", color: "#15803d", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>通用候选</span><span style={{display: "inline-block", padding: "0.18rem 0.58rem", marginRight: "0.45rem", borderRadius: "999px", border: "1px solid rgba(75, 85, 99, 0.22)", background: "rgba(107, 114, 128, 0.14)", color: "#4b5563", fontWeight: 800, fontSize: "0.78em", letterSpacing: "0.04em", lineHeight: 1.2, verticalAlign: "middle"}}>待评审</span>`prefer_explicit_this`
+
+- 中文释义：字段访问显式写出 `this.`。
+- 上游说明：Use `this.field` for field access
+- 初筛分组：通用候选
+- 建议讨论方式：建议会前异步预投票，把有分歧项带入会议。
+- 快速修复：否
+- 上游链接：[查看原始规则](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_explicit_this)
+
+**评审记录模板**
+
+- 当前结论：`待评审`
+- 会议决定：`采纳 / 不采纳 / 试运行 / 暂缓`
+- 结论理由：待填写
+- 负责人：待填写
+- 后续动作：待填写
+
+> 示例：上游文档未提供，讨论时可结合项目内真实代码补充。
+
+

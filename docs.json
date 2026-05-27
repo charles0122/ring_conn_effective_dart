@@ -38,31 +38,10 @@
         {
           "title": "Figma 开发操作",
           "href": "/team-guidelines/figma-dev-mode"
-        }
-      ]
-    },
-    {
-      "group": "官方参考",
-      "pages": [
-        {
-          "title": "概览",
-          "href": "/effective-dart"
         },
         {
-          "title": "代码风格",
-          "href": "/effective-dart/style"
-        },
-        {
-          "title": "文档",
-          "href": "/effective-dart/documentation"
-        },
-        {
-          "title": "用法示例",
-          "href": "/effective-dart/usage"
-        },
-        {
-          "title": "API 设计",
-          "href": "/effective-dart/design"
+          "title": "风格候选规则评审",
+          "href": "/team-guidelines/stylistic-review"
         }
       ]
     }
