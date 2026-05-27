@@ -562,7 +562,8 @@ def render_candidate_sections(candidates: list[RuleCandidate]) -> list[str]:
         ):
             bucket_badge = build_badge(candidate.review_bucket, BUCKET_STYLES[candidate.review_bucket])
             pending_badge = build_badge("待评审", DECISION_STYLES["待评审"])
-            lines.append(f"### {bucket_badge}{pending_badge}`{candidate.rule}`\n\n")
+            lines.append(f"### `{candidate.rule}`\n\n")
+            lines.append(f"{bucket_badge}{pending_badge}\n\n")
             lines.append(f"- 中文释义：{candidate.gloss}\n")
             lines.append(f"- 上游说明：{candidate.description}\n")
             lines.append(f"- 初筛分组：{candidate.review_bucket}\n")
