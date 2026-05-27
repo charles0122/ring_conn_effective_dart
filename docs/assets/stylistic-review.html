@@ -1,0 +1,3090 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>团队规范：风格候选规则评审</title>
+    <style>
+      :root {
+        --bg: #f4f1ea;
+        --panel: #fffdf8;
+        --ink: #1f2937;
+        --muted: #6b7280;
+        --line: #e5ddd0;
+        --accent: #1d4ed8;
+        --good: #15803d;
+        --warn: #b45309;
+        --bad: #b91c1c;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "PingFang SC", "Noto Sans SC", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(29, 78, 216, 0.08), transparent 28%),
+          linear-gradient(180deg, #f7f3eb 0%, #f2eee6 100%);
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .page {
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 32px 20px 80px;
+      }
+      .hero, .summary, .nav, .pairs, .category {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: 0 18px 50px rgba(31, 41, 55, 0.06);
+        padding: 24px;
+        margin-bottom: 20px;
+      }
+      .hero h1 { margin: 0 0 12px; font-size: 32px; }
+      .hero p, .muted { color: var(--muted); }
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+      }
+      .summary-item {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px 16px;
+        background: #fffaf2;
+      }
+      .summary-item strong {
+        display: block;
+        font-size: 24px;
+        margin-top: 8px;
+      }
+      .nav ul { margin: 0; padding-left: 18px; columns: 2; }
+      .nav li { margin: 6px 0; }
+      .pair-card, .rule-card {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+        background: #fffefb;
+        margin-top: 16px;
+      }
+      .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .card-head h3, .pair-card h3 { margin: 0; }
+      .meta { display: flex; gap: 8px; flex-wrap: wrap; }
+      .bucket, .decision {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .bucket-二选一 { background: rgba(239, 68, 68, 0.12); color: var(--bad); }
+      .bucket-低成本候选 { background: rgba(59, 130, 246, 0.12); color: var(--accent); }
+      .bucket-通用候选 { background: rgba(34, 197, 94, 0.12); color: var(--good); }
+      .bucket-项目\/业务相关 { background: rgba(245, 158, 11, 0.14); color: var(--warn); }
+      .bucket-版本前提 { background: rgba(20, 184, 166, 0.12); color: #0f766e; }
+      .decision { background: rgba(107, 114, 128, 0.14); color: #4b5563; }
+      ul { margin: 12px 0 0; padding-left: 18px; }
+      li { margin: 6px 0; }
+      .decision-block {
+        margin-top: 14px;
+        border-top: 1px dashed var(--line);
+        padding-top: 14px;
+      }
+      .examples {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .example-block {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #faf6ef;
+        overflow: hidden;
+      }
+      .example-title {
+        padding: 10px 14px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid var(--line);
+        background: #fff8ec;
+      }
+      pre {
+        margin: 0;
+        padding: 14px;
+        overflow: auto;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      code { font-family: "SFMono-Regular", "JetBrains Mono", monospace; }
+      @media (max-width: 720px) {
+        .nav ul { columns: 1; }
+        .page { padding: 20px 14px 60px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <h1>团队规范：风格候选规则评审</h1>
+        <p>这份 HTML 页面用于团队会前预读和会议逐条评审，规则名称与上游 lint id 保持一致，评审结束后再整理为正式的 docs.page 规范页面。</p>
+        <p>
+          <a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md">查看上游 README</a>
+          · <a href="/assets/stylistic-rule-review.csv">下载 CSV</a>
+          · 最近同步：2026-05-27
+        </p>
+      </section>
+      <section class="summary">
+        <h2>初筛统计</h2>
+        <div class="summary-grid">
+          <div class="summary-item">总候选规则<strong>86</strong></div>
+          <div class="summary-item">二选一规则<strong>46</strong></div>
+          <div class="summary-item">冲突组数<strong>24</strong></div>
+          <div class="summary-item">低成本候选<strong>14</strong></div>
+          <div class="summary-item">通用候选<strong>17</strong></div>
+          <div class="summary-item">项目/业务相关<strong>7</strong></div>
+          <div class="summary-item">版本前提<strong>2</strong></div>
+        </div>
+      </section>
+      <section class="nav">
+        <h2>快速导航</h2>
+        <ul><li><a href="#附加风格规则 / 导入组织">附加风格规则 / 导入组织</a></li><li><a href="#通用风格规则">通用风格规则</a></li><li><a href="#Widget 偏好">Widget 偏好</a></li><li><a href="#空值与集合处理">空值与集合处理</a></li><li><a href="#控制流与异步">控制流与异步</a></li><li><a href="#空行与构造函数">空行与构造函数</a></li><li><a href="#异常处理与测试">异常处理与测试</a></li><li><a href="#附加风格规则 / 字符串处理">附加风格规则 / 字符串处理</a></li><li><a href="#附加风格规则 / 类结构">附加风格规则 / 类结构</a></li><li><a href="#附加风格规则 / 类型标注">附加风格规则 / 类型标注</a></li><li><a href="#附加风格规则 / 命名约定">附加风格规则 / 命名约定</a></li><li><a href="#附加风格规则 / 表达式风格">附加风格规则 / 表达式风格</a></li></ul>
+      </section>
+      <section class="pairs">
+        <h2>二选一冲突规则</h2>
+        <p class="muted">会议中优先讨论这些必须成对取舍的规则。</p>
+        
+            <section class="pair-card">
+              <h3>prefer_container_over_sizedbox vs prefer_sizedbox_over_container</h3>
+              <ul>
+                <li><strong>分类：</strong>Widget 偏好</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_container_over_sizedbox">prefer_container_over_sizedbox</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_sizedbox_over_container">prefer_sizedbox_over_container</a></li>
+                <li><strong>中文释义：</strong>A 为“简单布局场景也优先统一使用 `Container`。” B 为“简单尺寸占位优先使用 `SizedBox`。”</li>
+                <li><strong>上游取舍点：</strong>Prefer Container for consistency / Use SizedBox for simple sizing</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>SizedBox(width: 100, height: 50)</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>Container(width: 100, height: 50)</code></pre></div></div>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_edgeinsets_only vs prefer_edgeinsets_symmetric</h3>
+              <ul>
+                <li><strong>分类：</strong>Widget 偏好</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_edgeinsets_only">prefer_edgeinsets_only</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_edgeinsets_symmetric">prefer_edgeinsets_symmetric</a></li>
+                <li><strong>中文释义：</strong>A 为“边距优先显式写成 `EdgeInsets.only`。” B 为“对称边距优先使用 `EdgeInsets.symmetric`。”</li>
+                <li><strong>上游取舍点：</strong>Use EdgeInsets.only for explicit values / Use EdgeInsets.symmetric when applicable</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_expanded_over_flexible vs prefer_flexible_over_expanded</h3>
+              <ul>
+                <li><strong>分类：</strong>Widget 偏好</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_expanded_over_flexible">prefer_expanded_over_flexible</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_flexible_over_expanded">prefer_flexible_over_expanded</a></li>
+                <li><strong>中文释义：</strong>A 为“等分拉伸场景优先使用 `Expanded`。” B 为“拉伸布局优先使用 `Flexible` 表达控制意图。”</li>
+                <li><strong>上游取舍点：</strong>Use Expanded instead of Flexible(flex: 1) / Prefer Flexible for explicit control</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_explicit_colors vs prefer_material_theme_colors</h3>
+              <ul>
+                <li><strong>分类：</strong>Widget 偏好</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_explicit_colors">prefer_explicit_colors</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_material_theme_colors">prefer_material_theme_colors</a></li>
+                <li><strong>中文释义：</strong>A 为“颜色优先直接显式指定。” B 为“颜色优先从主题中读取。”</li>
+                <li><strong>上游取舍点：</strong>Use explicit color values / Use Theme.of(context) colors</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_richtext_over_text_rich vs prefer_text_rich_over_richtext</h3>
+              <ul>
+                <li><strong>分类：</strong>Widget 偏好</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_richtext_over_text_rich">prefer_richtext_over_text_rich</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_text_rich_over_richtext">prefer_text_rich_over_richtext</a></li>
+                <li><strong>中文释义：</strong>A 为“富文本优先直接使用 `RichText`。” B 为“富文本优先使用 `Text.rich`。”</li>
+                <li><strong>上游取舍点：</strong>Use RichText over Text.rich / Use Text.rich over RichText widget</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_catch_over_on vs prefer_on_over_catch</h3>
+              <ul>
+                <li><strong>分类：</strong>异常处理与测试</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_catch_over_on">prefer_catch_over_on</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_on_over_catch">prefer_on_over_catch</a></li>
+                <li><strong>中文释义：</strong>A 为“try-catch 优先使用裸 `catch (e)`。” B 为“try-catch 优先使用 `on 类型` 形式。”</li>
+                <li><strong>上游取舍点：</strong>Use bare `catch (e)` / Use `on ExceptionType` in try-catch</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_error_suffix vs prefer_exception_suffix</h3>
+              <ul>
+                <li><strong>分类：</strong>异常处理与测试</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_error_suffix">prefer_error_suffix</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_exception_suffix">prefer_exception_suffix</a></li>
+                <li><strong>中文释义：</strong>A 为“异常类命名以 `Error` 结尾。” B 为“异常类命名以 `Exception` 结尾。”</li>
+                <li><strong>上游取舍点：</strong>Exception classes end with &quot;Error&quot; / Exception classes end with &quot;Exception&quot;</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_generic_exception vs prefer_specific_exceptions</h3>
+              <ul>
+                <li><strong>分类：</strong>异常处理与测试</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_generic_exception">prefer_generic_exception</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_specific_exceptions">prefer_specific_exceptions</a></li>
+                <li><strong>中文释义：</strong>A 为“抛错时统一使用通用 `Exception`。” B 为“抛错时优先使用具体异常类型。”</li>
+                <li><strong>上游取舍点：</strong>Use generic Exception class / Throw specific exception types</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_given_when_then_comments vs prefer_self_documenting_tests</h3>
+              <ul>
+                <li><strong>分类：</strong>异常处理与测试</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_given_when_then_comments">prefer_given_when_then_comments</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_self_documenting_tests">prefer_self_documenting_tests</a></li>
+                <li><strong>中文释义：</strong>A 为“测试中使用 Arrange/Act/Assert 或 Given/When/Then 注释。” B 为“测试代码依靠命名和结构自解释，不额外写结构注释。”</li>
+                <li><strong>上游取舍点：</strong>Use AAA/GWT comments in tests / No structure comments in tests</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>test(&#x27;user login&#x27;, () { final user = User(&#x27;test@example.com&#x27;); final result = authService.login(user); expect(result.isSuccess, true); })</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>test(&#x27;user login&#x27;, () { // Arrange ... // Act ... // Assert ... })</code></pre></div></div>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_grouped_expectations vs prefer_single_expectation_per_test</h3>
+              <ul>
+                <li><strong>分类：</strong>异常处理与测试</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_grouped_expectations">prefer_grouped_expectations</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_single_expectation_per_test">prefer_single_expectation_per_test</a></li>
+                <li><strong>中文释义：</strong>A 为“相关断言允许集中写在一个测试里。” B 为“每个测试尽量只保留一个断言目标。”</li>
+                <li><strong>上游取舍点：</strong>Group related assertions / One assertion per test</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_test_name_descriptive vs prefer_test_name_should_when</h3>
+              <ul>
+                <li><strong>分类：</strong>异常处理与测试</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_test_name_descriptive">prefer_test_name_descriptive</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_test_name_should_when">prefer_test_name_should_when</a></li>
+                <li><strong>中文释义：</strong>A 为“测试名采用自然描述式命名。” B 为“测试名采用 `should ... when ...` 句式。”</li>
+                <li><strong>上游取舍点：</strong>Descriptive test names / Test names: &quot;should X when Y&quot;</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_switch_expression vs prefer_switch_statement</h3>
+              <ul>
+                <li><strong>分类：</strong>控制流与异步</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_switch_expression">prefer_switch_expression</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_switch_statement">prefer_switch_statement</a></li>
+                <li><strong>中文释义：</strong>A 为“分支表达优先使用 switch expression。” B 为“分支表达优先使用传统 switch statement。”</li>
+                <li><strong>上游取舍点：</strong>Use switch expressions (Dart 3) / Use switch statements</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_addall_over_spread vs prefer_spread_over_addall</h3>
+              <ul>
+                <li><strong>分类：</strong>空值与集合处理</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_addall_over_spread">prefer_addall_over_spread</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_spread_over_addall">prefer_spread_over_addall</a></li>
+                <li><strong>中文释义：</strong>A 为“集合追加元素优先使用 `addAll()`。” B 为“集合拼接优先使用展开运算符 `...`。”</li>
+                <li><strong>上游取舍点：</strong>Use addAll method / Use `...` spread operator</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_blank_line_before_return vs prefer_no_blank_line_before_return</h3>
+              <ul>
+                <li><strong>分类：</strong>空行与构造函数</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_blank_line_before_return">prefer_blank_line_before_return</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_no_blank_line_before_return">prefer_no_blank_line_before_return</a></li>
+                <li><strong>中文释义：</strong>A 为“return 前保留一行空行。” B 为“return 前不额外插入空行。”</li>
+                <li><strong>上游取舍点：</strong>Blank line before return statements / No blank line before return</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_lower_camel_case_constants vs prefer_screaming_case_constants</h3>
+              <ul>
+                <li><strong>分类：</strong>附加风格规则 / 命名约定</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_lower_camel_case_constants">prefer_lower_camel_case_constants</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_screaming_case_constants">prefer_screaming_case_constants</a></li>
+                <li><strong>中文释义：</strong>A 为“常量采用 `lowerCamelCase` 命名。” B 为“常量使用全大写下划线命名。”</li>
+                <li><strong>上游取舍点：</strong>Constants: `maxRetries` / Constants in `SCREAMING_SNAKE_CASE`</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_concatenation_over_interpolation vs prefer_interpolation_over_concatenation</h3>
+              <ul>
+                <li><strong>分类：</strong>附加风格规则 / 字符串处理</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_concatenation_over_interpolation">prefer_concatenation_over_interpolation</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_interpolation_over_concatenation">prefer_interpolation_over_concatenation</a></li>
+                <li><strong>中文释义：</strong>A 为“字符串拼接优先使用 `+` 连接。” B 为“字符串拼接优先使用插值。”</li>
+                <li><strong>上游取舍点：</strong>Use `&#x27;Hello, &#x27; + name` / Use `&#x27;Hello, $name&#x27;`</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_double_quotes vs prefer_single_quotes</h3>
+              <ul>
+                <li><strong>分类：</strong>附加风格规则 / 字符串处理</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_double_quotes">prefer_double_quotes</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_single_quotes">prefer_single_quotes</a></li>
+                <li><strong>中文释义：</strong>A 为“字符串默认使用双引号。” B 为“字符串默认使用单引号。”</li>
+                <li><strong>上游取舍点：</strong>Use double quotes for strings / Single quotes `&#x27;string&#x27;` instead of double quotes</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_absolute_imports vs prefer_relative_imports</h3>
+              <ul>
+                <li><strong>分类：</strong>附加风格规则 / 导入组织</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_absolute_imports">prefer_absolute_imports</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_relative_imports">prefer_relative_imports</a></li>
+                <li><strong>中文释义：</strong>A 为“导入本地包内文件优先使用 `package:` 路径。” B 为“同包内文件优先使用相对导入。”</li>
+                <li><strong>上游取舍点：</strong>Use `package:` imports / Use relative imports instead of absolute `package:` imports</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_flat_imports vs prefer_grouped_imports</h3>
+              <ul>
+                <li><strong>分类：</strong>附加风格规则 / 导入组织</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_flat_imports">prefer_flat_imports</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_grouped_imports">prefer_grouped_imports</a></li>
+                <li><strong>中文释义：</strong>A 为“导入列表保持扁平，不做分组。” B 为“导入按 `dart / package / relative` 分组。”</li>
+                <li><strong>上游取舍点：</strong>No grouping, flat import list / Group: dart, package, relative</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_dynamic_over_object vs prefer_object_over_dynamic</h3>
+              <ul>
+                <li><strong>分类：</strong>附加风格规则 / 类型标注</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_dynamic_over_object">prefer_dynamic_over_object</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_object_over_dynamic">prefer_object_over_dynamic</a></li>
+                <li><strong>中文释义：</strong>A 为“确实需要动态行为时优先直接使用 `dynamic`。” B 为“动态场景优先使用 `Object?` 而不是 `dynamic`。”</li>
+                <li><strong>上游取舍点：</strong>Use `dynamic` for truly dynamic types / Use `Object?` instead of `dynamic`</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_fields_before_methods vs prefer_methods_before_fields</h3>
+              <ul>
+                <li><strong>分类：</strong>附加风格规则 / 类结构</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_fields_before_methods">prefer_fields_before_methods</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_methods_before_fields">prefer_methods_before_fields</a></li>
+                <li><strong>中文释义：</strong>A 为“类中字段定义放在方法前面。” B 为“类中方法定义放在字段前面。”</li>
+                <li><strong>上游取舍点：</strong>Fields declared before methods / Methods declared before fields</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_instance_members_first vs prefer_static_members_first</h3>
+              <ul>
+                <li><strong>分类：</strong>附加风格规则 / 类结构</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_instance_members_first">prefer_instance_members_first</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_static_members_first">prefer_static_members_first</a></li>
+                <li><strong>中文释义：</strong>A 为“实例成员放在静态成员前面。” B 为“静态成员放在实例成员前面。”</li>
+                <li><strong>上游取舍点：</strong>Instance members before static / Static members before instance</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_private_members_first vs prefer_public_members_first</h3>
+              <ul>
+                <li><strong>分类：</strong>附加风格规则 / 类结构</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_private_members_first">prefer_private_members_first</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_public_members_first">prefer_public_members_first</a></li>
+                <li><strong>中文释义：</strong>A 为“私有成员放在公开成员前面。” B 为“公开成员放在私有成员前面。”</li>
+                <li><strong>上游取舍点：</strong>Private members before public / Public members before private</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+            <section class="pair-card">
+              <h3>prefer_explicit_boolean_comparison vs prefer_implicit_boolean_comparison</h3>
+              <ul>
+                <li><strong>分类：</strong>附加风格规则 / 表达式风格</li>
+                <li><strong>方案 A：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_explicit_boolean_comparison">prefer_explicit_boolean_comparison</a></li>
+                <li><strong>方案 B：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_implicit_boolean_comparison">prefer_implicit_boolean_comparison</a></li>
+                <li><strong>中文释义：</strong>A 为“布尔判断显式写成与 `true/false` 的比较。” B 为“布尔判断优先直接写 `if (flag)`。”</li>
+                <li><strong>上游取舍点：</strong>Use `if (isValid == true)` for nullable bools / Use `if (isValid)` not `if (isValid == true)`</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+            </section>
+            
+      </section>
+      
+            <section class="category" id="附加风格规则 / 导入组织">
+              <h2>附加风格规则 / 导入组织</h2>
+              <p class="muted">本分类共 5 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_absolute_imports">
+                  <div class="card-head">
+                    <h3>prefer_absolute_imports</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>导入本地包内文件优先使用 `package:` 路径。</li>
+                    <li><strong>上游说明：</strong>Use `package:` imports</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_absolute_imports">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_relative_imports'>prefer_relative_imports</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_flat_imports">
+                  <div class="card-head">
+                    <h3>prefer_flat_imports</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>导入列表保持扁平，不做分组。</li>
+                    <li><strong>上游说明：</strong>No grouping, flat import list</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_flat_imports">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_grouped_imports'>prefer_grouped_imports</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_grouped_imports">
+                  <div class="card-head">
+                    <h3>prefer_grouped_imports</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>导入按 `dart / package / relative` 分组。</li>
+                    <li><strong>上游说明：</strong>Group: dart, package, relative</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_grouped_imports">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_flat_imports'>prefer_flat_imports</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_relative_imports">
+                  <div class="card-head">
+                    <h3>prefer_relative_imports</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>同包内文件优先使用相对导入。</li>
+                    <li><strong>上游说明：</strong>Use relative imports instead of absolute `package:` imports</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_relative_imports">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_absolute_imports'>prefer_absolute_imports</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>import &#x27;package:my_app/src/utils/helpers.dart&#x27;;</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>import &#x27;../utils/helpers.dart&#x27;;</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_named_imports">
+                  <div class="card-head">
+                    <h3>prefer_named_imports</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>导入时优先使用 `show` / `hide` 明确暴露内容。</li>
+                    <li><strong>上游说明：</strong>Use `show`/`hide` for explicit imports</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_named_imports">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="通用风格规则">
+              <h2>通用风格规则</h2>
+              <p class="muted">本分类共 33 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="arguments_ordering">
+                  <div class="card-head">
+                    <h3>arguments_ordering</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>命名参数按字母顺序排列。</li>
+                    <li><strong>上游说明：</strong>Named arguments should be in alphabetical order</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#arguments_ordering">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="avoid_small_text">
+                  <div class="card-head">
+                    <h3>avoid_small_text</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>文本字号避免小于 12，兼顾可访问性。</li>
+                    <li><strong>上游说明：</strong>Font size at least 12 for accessibility</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#avoid_small_text">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>Text(&#x27;Small&#x27;, style: TextStyle(fontSize: 10));</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>Text(&#x27;Readable&#x27;, style: TextStyle(fontSize: 14));</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="capitalize_comment">
+                  <div class="card-head">
+                    <h3>capitalize_comment</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>注释以大写字母开头。</li>
+                    <li><strong>上游说明：</strong>Comments should start with a capital letter</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#capitalize_comment">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_arrow_functions">
+                  <div class="card-head">
+                    <h3>prefer_arrow_functions</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>单返回表达式函数优先使用箭头语法。</li>
+                    <li><strong>上游说明：</strong>Use `=&gt;` arrow syntax for single-return functions</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_arrow_functions">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>int double(int x) {
+  return x * 2;
+}</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>int double(int x) =&gt; x * 2;</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_curly_apostrophe">
+                  <div class="card-head">
+                    <h3>prefer_curly_apostrophe</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>字符串中的撇号优先使用弯引号。</li>
+                    <li><strong>上游说明：</strong>Curly apostrophe `&#x27;` in strings</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_curly_apostrophe">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>String message = &quot;It&#x27;s a beautiful day&quot;;  // Straight apostrophe U+0027</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>String message = &quot;It&#x27;s a beautiful day&quot;;  // Curly apostrophe U+2019</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_doc_comments_over_regular">
+                  <div class="card-head">
+                    <h3>prefer_doc_comments_over_regular</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>公开 API 说明优先使用 `///` 文档注释。</li>
+                    <li><strong>上游说明：</strong>Use `///` instead of `//` for public API docs</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_doc_comments_over_regular">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_doc_curly_apostrophe">
+                  <div class="card-head">
+                    <h3>prefer_doc_curly_apostrophe</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>文档注释中的撇号优先使用弯引号。</li>
+                    <li><strong>上游说明：</strong>Curly apostrophe `&#x27;` in doc comments</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_doc_curly_apostrophe">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>/// It&#x27;s a beautiful day.  // Straight apostrophe</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>/// It&#x27;s a beautiful day.  // Curly apostrophe</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_doc_straight_apostrophe">
+                  <div class="card-head">
+                    <h3>prefer_doc_straight_apostrophe</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>文档注释中的撇号优先使用直引号。</li>
+                    <li><strong>上游说明：</strong>Straight apostrophe `&#x27;` in doc comments</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_doc_straight_apostrophe">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>/// It&#x27;s a beautiful day.  // Curly apostrophe U+2019</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>/// It&#x27;s a beautiful day.  // Straight apostrophe U+0027</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_period_after_doc">
+                  <div class="card-head">
+                    <h3>prefer_period_after_doc</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>文档注释结尾补句号。</li>
+                    <li><strong>上游说明：</strong>Doc comments end with period</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_period_after_doc">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_screaming_case_constants">
+                  <div class="card-head">
+                    <h3>prefer_screaming_case_constants</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>常量使用全大写下划线命名。</li>
+                    <li><strong>上游说明：</strong>Constants in `SCREAMING_SNAKE_CASE`</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_screaming_case_constants">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>const int maxRetries = 3;</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>const int MAX_RETRIES = 3;</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_sentence_case_comments">
+                  <div class="card-head">
+                    <h3>prefer_sentence_case_comments</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>普通注释以句首大写风格书写。</li>
+                    <li><strong>上游说明：</strong>Comments start with capital letter</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_sentence_case_comments">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_single_quotes">
+                  <div class="card-head">
+                    <h3>prefer_single_quotes</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>字符串默认使用单引号。</li>
+                    <li><strong>上游说明：</strong>Single quotes `&#x27;string&#x27;` instead of double quotes</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_single_quotes">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>String name = &quot;John&quot;;</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>String name = &#x27;John&#x27;;</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_straight_apostrophe">
+                  <div class="card-head">
+                    <h3>prefer_straight_apostrophe</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>字符串中的撇号优先使用直引号。</li>
+                    <li><strong>上游说明：</strong>Straight apostrophe `&#x27;` in strings</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_straight_apostrophe">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>String message = &quot;It&#x27;s a beautiful day&quot;;  // Curly apostrophe U+2019</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>String message = &quot;It&#x27;s a beautiful day&quot;;  // Straight apostrophe U+0027</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_trailing_comma_always">
+                  <div class="card-head">
+                    <h3>prefer_trailing_comma_always</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-低成本候选">低成本候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>多行结构统一保留尾随逗号。</li>
+                    <li><strong>上游说明：</strong>Trailing commas on all multi-line constructs</li>
+                    <li><strong>快速修复：</strong>是</li>
+                    <li><strong>建议讨论方式：</strong>可先在分支试运行，再决定是否正式采纳。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_trailing_comma_always">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>return Container(
+  child: Text(&#x27;Hello&#x27;)  // Missing trailing comma
+);</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>return Container(
+  child: Text(&#x27;Hello&#x27;),
+);</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_all_named_parameters">
+                  <div class="card-head">
+                    <h3>prefer_all_named_parameters</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>当位置参数较多时，优先改为命名参数。</li>
+                    <li><strong>上游说明：</strong>Use named parameters when 3+ positional params</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_all_named_parameters">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>void createUser(String name, String email, int age, bool isAdmin) { ... }
+createUser(&#x27;John&#x27;, &#x27;john@example.com&#x27;, 30, true);  // Unclear</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>void createUser({
+  required String name,
+  required String email,
+  required int age,
+  required bool isAdmin,
+}) { ... }
+createUser(name: &#x27;John&#x27;, email: &#x27;john@example.com&#x27;, age: 30, isAdmin: true);</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_class_over_record_return">
+                  <div class="card-head">
+                    <h3>prefer_class_over_record_return</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>方法返回值优先用类而不是 record。</li>
+                    <li><strong>上游说明：</strong>Return classes instead of records from methods</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_class_over_record_return">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_descriptive_bool_names">
+                  <div class="card-head">
+                    <h3>prefer_descriptive_bool_names</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>布尔命名使用 `is/has/can` 等语义前缀。</li>
+                    <li><strong>上游说明：</strong>Booleans use `is`/`has`/`can` prefix</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_descriptive_bool_names">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>bool admin = true;</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>bool isAdmin = true;
+bool hasPermission = true;
+bool canEdit = true;</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_fixme_format">
+                  <div class="card-head">
+                    <h3>prefer_fixme_format</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>FIXME 注释统一采用 `FIXME(author): 描述` 格式。</li>
+                    <li><strong>上游说明：</strong>FIXMEs follow `FIXME(author): description` format</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_fixme_format">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_inline_callbacks">
+                  <div class="card-head">
+                    <h3>prefer_inline_callbacks</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>回调优先内联编写，不额外提取方法引用。</li>
+                    <li><strong>上游说明：</strong>Inline callbacks instead of method references</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_inline_callbacks">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_one_widget_per_file">
+                  <div class="card-head">
+                    <h3>prefer_one_widget_per_file</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>每个文件尽量只放一个 Widget 类。</li>
+                    <li><strong>上游说明：</strong>One widget class per file</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_one_widget_per_file">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>// my_widgets.dart
+class MyButton extends StatelessWidget { ... }
+class MyCard extends StatelessWidget { ... }  // Second widget triggers warning</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>// my_button.dart
+class MyButton extends StatelessWidget { ... }
+// my_card.dart (separate file)
+class MyCard extends StatelessWidget { ... }</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_private_underscore_prefix">
+                  <div class="card-head">
+                    <h3>prefer_private_underscore_prefix</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>实例字段默认使用下划线私有化。</li>
+                    <li><strong>上游说明：</strong>All instance fields should be private (`_name`)</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_private_underscore_prefix">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_rethrow_over_throw_e">
+                  <div class="card-head">
+                    <h3>prefer_rethrow_over_throw_e</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>在 catch 中优先使用 `rethrow`，避免 `throw e`。</li>
+                    <li><strong>上游说明：</strong>Prefer &#x27;rethrow&#x27; over &#x27;throw e&#x27; in catch blocks</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_rethrow_over_throw_e">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_snake_case_files">
+                  <div class="card-head">
+                    <h3>prefer_snake_case_files</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>文件名统一使用 `snake_case.dart`。</li>
+                    <li><strong>上游说明：</strong>File names in `snake_case.dart`</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_snake_case_files">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_sorted_parameters">
+                  <div class="card-head">
+                    <h3>prefer_sorted_parameters</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>函数参数顺序遵守团队约定。</li>
+                    <li><strong>上游说明：</strong>Function parameters should be sorted by team convention</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_sorted_parameters">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_todo_format">
+                  <div class="card-head">
+                    <h3>prefer_todo_format</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>TODO 注释统一采用 `TODO(author): 描述` 格式。</li>
+                    <li><strong>上游说明：</strong>TODOs follow `TODO(author): description` format</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_todo_format">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_widget_methods_over_classes">
+                  <div class="card-head">
+                    <h3>prefer_widget_methods_over_classes</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>小型 Widget 优先写成方法而不是单独类。</li>
+                    <li><strong>上游说明：</strong>Small widgets as methods instead of classes</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_widget_methods_over_classes">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="avoid_generic_greeting_text">
+                  <div class="card-head">
+                    <h3>avoid_generic_greeting_text</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-项目/业务相关">项目/业务相关</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>问候语文案遵守团队统一风格。</li>
+                    <li><strong>上游说明：</strong>Greeting messages should follow team style conventions</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>结合现有业务模块、团队习惯和适用范围讨论。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#avoid_generic_greeting_text">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="firebase_custom">
+                  <div class="card-head">
+                    <h3>firebase_custom</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-项目/业务相关">项目/业务相关</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>Firebase 相关写法遵守团队自定义约定。</li>
+                    <li><strong>上游说明：</strong>Custom Firebase usage should follow team conventions</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>结合现有业务模块、团队习惯和适用范围讨论。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#firebase_custom">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_kebab_tag_name">
+                  <div class="card-head">
+                    <h3>prefer_kebab_tag_name</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-项目/业务相关">项目/业务相关</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>标签名统一使用 kebab-case。</li>
+                    <li><strong>上游说明：</strong>Tag names should use kebab-case</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>结合现有业务模块、团队习惯和适用范围讨论。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_kebab_tag_name">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="purchase_completed">
+                  <div class="card-head">
+                    <h3>purchase_completed</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-项目/业务相关">项目/业务相关</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>购买完成逻辑遵守团队既定写法。</li>
+                    <li><strong>上游说明：</strong>Purchase completion logic should follow team style conventions</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>结合现有业务模块、团队习惯和适用范围讨论。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#purchase_completed">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="require_purchase_verification">
+                  <div class="card-head">
+                    <h3>require_purchase_verification</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-项目/业务相关">项目/业务相关</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>购买流程需遵守校验相关团队约定。</li>
+                    <li><strong>上游说明：</strong>Purchase logic should follow team style conventions</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>结合现有业务模块、团队习惯和适用范围讨论。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#require_purchase_verification">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="require_save_confirmation">
+                  <div class="card-head">
+                    <h3>require_save_confirmation</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-项目/业务相关">项目/业务相关</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>保存行为需要符合确认流程约定。</li>
+                    <li><strong>上游说明：</strong>Save logic should follow team style conventions</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>结合现有业务模块、团队习惯和适用范围讨论。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#require_save_confirmation">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="user_clicked_button">
+                  <div class="card-head">
+                    <h3>user_clicked_button</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-项目/业务相关">项目/业务相关</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>按钮点击逻辑遵守团队交互约定。</li>
+                    <li><strong>上游说明：</strong>Button click logic should follow team style conventions</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>结合现有业务模块、团队习惯和适用范围讨论。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#user_clicked_button">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="Widget 偏好">
+              <h2>Widget 偏好</h2>
+              <p class="muted">本分类共 13 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_container_over_sizedbox">
+                  <div class="card-head">
+                    <h3>prefer_container_over_sizedbox</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>简单布局场景也优先统一使用 `Container`。</li>
+                    <li><strong>上游说明：</strong>Prefer Container for consistency</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_container_over_sizedbox">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_sizedbox_over_container'>prefer_sizedbox_over_container</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>SizedBox(width: 100, height: 50)</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>Container(width: 100, height: 50)</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_edgeinsets_only">
+                  <div class="card-head">
+                    <h3>prefer_edgeinsets_only</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>边距优先显式写成 `EdgeInsets.only`。</li>
+                    <li><strong>上游说明：</strong>Use EdgeInsets.only for explicit values</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_edgeinsets_only">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_edgeinsets_symmetric'>prefer_edgeinsets_symmetric</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_edgeinsets_symmetric">
+                  <div class="card-head">
+                    <h3>prefer_edgeinsets_symmetric</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>对称边距优先使用 `EdgeInsets.symmetric`。</li>
+                    <li><strong>上游说明：</strong>Use EdgeInsets.symmetric when applicable</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_edgeinsets_symmetric">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_edgeinsets_only'>prefer_edgeinsets_only</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_expanded_over_flexible">
+                  <div class="card-head">
+                    <h3>prefer_expanded_over_flexible</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>等分拉伸场景优先使用 `Expanded`。</li>
+                    <li><strong>上游说明：</strong>Use Expanded instead of Flexible(flex: 1)</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_expanded_over_flexible">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_flexible_over_expanded'>prefer_flexible_over_expanded</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_explicit_colors">
+                  <div class="card-head">
+                    <h3>prefer_explicit_colors</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>颜色优先直接显式指定。</li>
+                    <li><strong>上游说明：</strong>Use explicit color values</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_explicit_colors">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_material_theme_colors'>prefer_material_theme_colors</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_flexible_over_expanded">
+                  <div class="card-head">
+                    <h3>prefer_flexible_over_expanded</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>拉伸布局优先使用 `Flexible` 表达控制意图。</li>
+                    <li><strong>上游说明：</strong>Prefer Flexible for explicit control</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_flexible_over_expanded">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_expanded_over_flexible'>prefer_expanded_over_flexible</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_material_theme_colors">
+                  <div class="card-head">
+                    <h3>prefer_material_theme_colors</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>颜色优先从主题中读取。</li>
+                    <li><strong>上游说明：</strong>Use Theme.of(context) colors</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_material_theme_colors">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_explicit_colors'>prefer_explicit_colors</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_richtext_over_text_rich">
+                  <div class="card-head">
+                    <h3>prefer_richtext_over_text_rich</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>富文本优先直接使用 `RichText`。</li>
+                    <li><strong>上游说明：</strong>Use RichText over Text.rich</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_richtext_over_text_rich">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_text_rich_over_richtext'>prefer_text_rich_over_richtext</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_sizedbox_over_container">
+                  <div class="card-head">
+                    <h3>prefer_sizedbox_over_container</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>简单尺寸占位优先使用 `SizedBox`。</li>
+                    <li><strong>上游说明：</strong>Use SizedBox for simple sizing</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_sizedbox_over_container">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_container_over_sizedbox'>prefer_container_over_sizedbox</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>Container(width: 100, height: 50)</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>SizedBox(width: 100, height: 50)</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_text_rich_over_richtext">
+                  <div class="card-head">
+                    <h3>prefer_text_rich_over_richtext</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>富文本优先使用 `Text.rich`。</li>
+                    <li><strong>上游说明：</strong>Use Text.rich over RichText widget</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_text_rich_over_richtext">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_richtext_over_text_rich'>prefer_richtext_over_text_rich</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_borderradius_circular">
+                  <div class="card-head">
+                    <h3>prefer_borderradius_circular</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>统一圆角优先使用 `BorderRadius.circular`。</li>
+                    <li><strong>上游说明：</strong>Use BorderRadius.circular for uniform corners</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_borderradius_circular">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_clip_r_superellipse">
+                  <div class="card-head">
+                    <h3>prefer_clip_r_superellipse</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-版本前提">版本前提</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>圆角裁剪优先使用 `ClipRSuperellipse`。</li>
+                    <li><strong>上游说明：</strong>Use ClipRSuperellipse over ClipRRect (quick fix)</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>先确认 Flutter 或 SDK 版本，再决定是否纳入候选。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_clip_r_superellipse">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network(&#x27;url&#x27;))</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>ClipRSuperellipse(borderRadius: BorderRadius.circular(10), child: Image.network(&#x27;url&#x27;))</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_clip_r_superellipse_clipper">
+                  <div class="card-head">
+                    <h3>prefer_clip_r_superellipse_clipper</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-版本前提">版本前提</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>带自定义裁剪时也优先使用 `ClipRSuperellipse`。</li>
+                    <li><strong>上游说明：</strong>Use ClipRSuperellipse over ClipRRect with custom clipper</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>先确认 Flutter 或 SDK 版本，再决定是否纳入候选。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_clip_r_superellipse_clipper">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network(&#x27;url&#x27;))</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>ClipRSuperellipse(borderRadius: BorderRadius.circular(10), child: Image.network(&#x27;url&#x27;))</code></pre></div></div>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="空值与集合处理">
+              <h2>空值与集合处理</h2>
+              <p class="muted">本分类共 2 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_addall_over_spread">
+                  <div class="card-head">
+                    <h3>prefer_addall_over_spread</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>集合追加元素优先使用 `addAll()`。</li>
+                    <li><strong>上游说明：</strong>Use addAll method</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_addall_over_spread">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_spread_over_addall'>prefer_spread_over_addall</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_spread_over_addall">
+                  <div class="card-head">
+                    <h3>prefer_spread_over_addall</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>集合拼接优先使用展开运算符 `...`。</li>
+                    <li><strong>上游说明：</strong>Use `...` spread operator</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_spread_over_addall">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_addall_over_spread'>prefer_addall_over_spread</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="控制流与异步">
+              <h2>控制流与异步</h2>
+              <p class="muted">本分类共 2 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_switch_expression">
+                  <div class="card-head">
+                    <h3>prefer_switch_expression</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>分支表达优先使用 switch expression。</li>
+                    <li><strong>上游说明：</strong>Use switch expressions (Dart 3)</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_switch_expression">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_switch_statement'>prefer_switch_statement</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_switch_statement">
+                  <div class="card-head">
+                    <h3>prefer_switch_statement</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>分支表达优先使用传统 switch statement。</li>
+                    <li><strong>上游说明：</strong>Use switch statements</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_switch_statement">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_switch_expression'>prefer_switch_expression</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="空行与构造函数">
+              <h2>空行与构造函数</h2>
+              <p class="muted">本分类共 2 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_blank_line_before_return">
+                  <div class="card-head">
+                    <h3>prefer_blank_line_before_return</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>return 前保留一行空行。</li>
+                    <li><strong>上游说明：</strong>Blank line before return statements</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_blank_line_before_return">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_no_blank_line_before_return'>prefer_no_blank_line_before_return</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_no_blank_line_before_return">
+                  <div class="card-head">
+                    <h3>prefer_no_blank_line_before_return</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>return 前不额外插入空行。</li>
+                    <li><strong>上游说明：</strong>No blank line before return</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_no_blank_line_before_return">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_blank_line_before_return'>prefer_blank_line_before_return</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="异常处理与测试">
+              <h2>异常处理与测试</h2>
+              <p class="muted">本分类共 13 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_catch_over_on">
+                  <div class="card-head">
+                    <h3>prefer_catch_over_on</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>try-catch 优先使用裸 `catch (e)`。</li>
+                    <li><strong>上游说明：</strong>Use bare `catch (e)`</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_catch_over_on">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_on_over_catch'>prefer_on_over_catch</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_error_suffix">
+                  <div class="card-head">
+                    <h3>prefer_error_suffix</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>异常类命名以 `Error` 结尾。</li>
+                    <li><strong>上游说明：</strong>Exception classes end with &quot;Error&quot;</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_error_suffix">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_exception_suffix'>prefer_exception_suffix</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_exception_suffix">
+                  <div class="card-head">
+                    <h3>prefer_exception_suffix</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>异常类命名以 `Exception` 结尾。</li>
+                    <li><strong>上游说明：</strong>Exception classes end with &quot;Exception&quot;</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_exception_suffix">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_error_suffix'>prefer_error_suffix</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_generic_exception">
+                  <div class="card-head">
+                    <h3>prefer_generic_exception</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>抛错时统一使用通用 `Exception`。</li>
+                    <li><strong>上游说明：</strong>Use generic Exception class</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_generic_exception">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_specific_exceptions'>prefer_specific_exceptions</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_given_when_then_comments">
+                  <div class="card-head">
+                    <h3>prefer_given_when_then_comments</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>测试中使用 Arrange/Act/Assert 或 Given/When/Then 注释。</li>
+                    <li><strong>上游说明：</strong>Use AAA/GWT comments in tests</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_given_when_then_comments">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_self_documenting_tests'>prefer_self_documenting_tests</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>test(&#x27;user login&#x27;, () { final user = User(&#x27;test@example.com&#x27;); final result = authService.login(user); expect(result.isSuccess, true); })</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>test(&#x27;user login&#x27;, () { // Arrange ... // Act ... // Assert ... })</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_grouped_expectations">
+                  <div class="card-head">
+                    <h3>prefer_grouped_expectations</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>相关断言允许集中写在一个测试里。</li>
+                    <li><strong>上游说明：</strong>Group related assertions</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_grouped_expectations">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_single_expectation_per_test'>prefer_single_expectation_per_test</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_on_over_catch">
+                  <div class="card-head">
+                    <h3>prefer_on_over_catch</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>try-catch 优先使用 `on 类型` 形式。</li>
+                    <li><strong>上游说明：</strong>Use `on ExceptionType` in try-catch</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_on_over_catch">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_catch_over_on'>prefer_catch_over_on</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_self_documenting_tests">
+                  <div class="card-head">
+                    <h3>prefer_self_documenting_tests</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>测试代码依靠命名和结构自解释，不额外写结构注释。</li>
+                    <li><strong>上游说明：</strong>No structure comments in tests</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_self_documenting_tests">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_given_when_then_comments'>prefer_given_when_then_comments</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <div class='examples'><div class='example-block'><div class='example-title'>BAD</div><pre><code>test(&#x27;user login&#x27;, () { // Arrange ... // Act ... // Assert ... })</code></pre></div><div class='example-block'><div class='example-title'>GOOD</div><pre><code>test(&#x27;user login&#x27;, () { final user = User(&#x27;test@example.com&#x27;); final result = authService.login(user); expect(result.isSuccess, true); })</code></pre></div></div>
+                </article>
+                
+                <article class="rule-card" id="prefer_single_expectation_per_test">
+                  <div class="card-head">
+                    <h3>prefer_single_expectation_per_test</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>每个测试尽量只保留一个断言目标。</li>
+                    <li><strong>上游说明：</strong>One assertion per test</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_single_expectation_per_test">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_grouped_expectations'>prefer_grouped_expectations</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_specific_exceptions">
+                  <div class="card-head">
+                    <h3>prefer_specific_exceptions</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>抛错时优先使用具体异常类型。</li>
+                    <li><strong>上游说明：</strong>Throw specific exception types</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_specific_exceptions">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_generic_exception'>prefer_generic_exception</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_test_name_descriptive">
+                  <div class="card-head">
+                    <h3>prefer_test_name_descriptive</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>测试名采用自然描述式命名。</li>
+                    <li><strong>上游说明：</strong>Descriptive test names</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_test_name_descriptive">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_test_name_should_when'>prefer_test_name_should_when</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_test_name_should_when">
+                  <div class="card-head">
+                    <h3>prefer_test_name_should_when</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>测试名采用 `should ... when ...` 句式。</li>
+                    <li><strong>上游说明：</strong>Test names: &quot;should X when Y&quot;</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_test_name_should_when">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_test_name_descriptive'>prefer_test_name_descriptive</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_expect_over_assert_in_tests">
+                  <div class="card-head">
+                    <h3>prefer_expect_over_assert_in_tests</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>测试断言优先使用 `expect()`。</li>
+                    <li><strong>上游说明：</strong>Use expect() instead of assert()</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_expect_over_assert_in_tests">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="附加风格规则 / 字符串处理">
+              <h2>附加风格规则 / 字符串处理</h2>
+              <p class="muted">本分类共 3 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_concatenation_over_interpolation">
+                  <div class="card-head">
+                    <h3>prefer_concatenation_over_interpolation</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>字符串拼接优先使用 `+` 连接。</li>
+                    <li><strong>上游说明：</strong>Use `&#x27;Hello, &#x27; + name`</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_concatenation_over_interpolation">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_interpolation_over_concatenation'>prefer_interpolation_over_concatenation</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_double_quotes">
+                  <div class="card-head">
+                    <h3>prefer_double_quotes</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>字符串默认使用双引号。</li>
+                    <li><strong>上游说明：</strong>Use double quotes for strings</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_double_quotes">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_single_quotes'>prefer_single_quotes</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_interpolation_over_concatenation">
+                  <div class="card-head">
+                    <h3>prefer_interpolation_over_concatenation</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>字符串拼接优先使用插值。</li>
+                    <li><strong>上游说明：</strong>Use `&#x27;Hello, $name&#x27;`</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_interpolation_over_concatenation">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_concatenation_over_interpolation'>prefer_concatenation_over_interpolation</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="附加风格规则 / 类结构">
+              <h2>附加风格规则 / 类结构</h2>
+              <p class="muted">本分类共 6 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_fields_before_methods">
+                  <div class="card-head">
+                    <h3>prefer_fields_before_methods</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>类中字段定义放在方法前面。</li>
+                    <li><strong>上游说明：</strong>Fields declared before methods</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_fields_before_methods">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_methods_before_fields'>prefer_methods_before_fields</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_instance_members_first">
+                  <div class="card-head">
+                    <h3>prefer_instance_members_first</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>实例成员放在静态成员前面。</li>
+                    <li><strong>上游说明：</strong>Instance members before static</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_instance_members_first">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_static_members_first'>prefer_static_members_first</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_methods_before_fields">
+                  <div class="card-head">
+                    <h3>prefer_methods_before_fields</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>类中方法定义放在字段前面。</li>
+                    <li><strong>上游说明：</strong>Methods declared before fields</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_methods_before_fields">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_fields_before_methods'>prefer_fields_before_methods</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_private_members_first">
+                  <div class="card-head">
+                    <h3>prefer_private_members_first</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>私有成员放在公开成员前面。</li>
+                    <li><strong>上游说明：</strong>Private members before public</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_private_members_first">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_public_members_first'>prefer_public_members_first</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_public_members_first">
+                  <div class="card-head">
+                    <h3>prefer_public_members_first</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>公开成员放在私有成员前面。</li>
+                    <li><strong>上游说明：</strong>Public members before private</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_public_members_first">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_private_members_first'>prefer_private_members_first</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_static_members_first">
+                  <div class="card-head">
+                    <h3>prefer_static_members_first</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>静态成员放在实例成员前面。</li>
+                    <li><strong>上游说明：</strong>Static members before instance</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_static_members_first">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_instance_members_first'>prefer_instance_members_first</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="附加风格规则 / 类型标注">
+              <h2>附加风格规则 / 类型标注</h2>
+              <p class="muted">本分类共 2 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_dynamic_over_object">
+                  <div class="card-head">
+                    <h3>prefer_dynamic_over_object</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>确实需要动态行为时优先直接使用 `dynamic`。</li>
+                    <li><strong>上游说明：</strong>Use `dynamic` for truly dynamic types</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_dynamic_over_object">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_object_over_dynamic'>prefer_object_over_dynamic</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_object_over_dynamic">
+                  <div class="card-head">
+                    <h3>prefer_object_over_dynamic</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>动态场景优先使用 `Object?` 而不是 `dynamic`。</li>
+                    <li><strong>上游说明：</strong>Use `Object?` instead of `dynamic`</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_object_over_dynamic">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_dynamic_over_object'>prefer_dynamic_over_object</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="附加风格规则 / 命名约定">
+              <h2>附加风格规则 / 命名约定</h2>
+              <p class="muted">本分类共 2 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_lower_camel_case_constants">
+                  <div class="card-head">
+                    <h3>prefer_lower_camel_case_constants</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>常量采用 `lowerCamelCase` 命名。</li>
+                    <li><strong>上游说明：</strong>Constants: `maxRetries`</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_lower_camel_case_constants">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_screaming_case_constants'>prefer_screaming_case_constants</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_camel_case_method_names">
+                  <div class="card-head">
+                    <h3>prefer_camel_case_method_names</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>方法名统一使用 `camelCase`。</li>
+                    <li><strong>上游说明：</strong>Methods: `fetchUserData`</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_camel_case_method_names">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+            <section class="category" id="附加风格规则 / 表达式风格">
+              <h2>附加风格规则 / 表达式风格</h2>
+              <p class="muted">本分类共 3 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              
+                <article class="rule-card" id="prefer_explicit_boolean_comparison">
+                  <div class="card-head">
+                    <h3>prefer_explicit_boolean_comparison</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>布尔判断显式写成与 `true/false` 的比较。</li>
+                    <li><strong>上游说明：</strong>Use `if (isValid == true)` for nullable bools</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_explicit_boolean_comparison">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_implicit_boolean_comparison'>prefer_implicit_boolean_comparison</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_implicit_boolean_comparison">
+                  <div class="card-head">
+                    <h3>prefer_implicit_boolean_comparison</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-二选一">二选一</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>布尔判断优先直接写 `if (flag)`。</li>
+                    <li><strong>上游说明：</strong>Use `if (isValid)` not `if (isValid == true)`</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>放入会议投票，必须和对立规则一起决策。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_implicit_boolean_comparison">查看原始规则</a></li>
+                    <li><strong>对立规则：</strong><a href='#prefer_explicit_boolean_comparison'>prefer_explicit_boolean_comparison</a></li>
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+                <article class="rule-card" id="prefer_explicit_this">
+                  <div class="card-head">
+                    <h3>prefer_explicit_this</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-通用候选">通用候选</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>字段访问显式写出 `this.`。</li>
+                    <li><strong>上游说明：</strong>Use `this.field` for field access</li>
+                    <li><strong>快速修复：</strong>否</li>
+                    <li><strong>建议讨论方式：</strong>建议会前异步预投票，把有分歧项带入会议。</li>
+                    <li><strong>上游链接：</strong><a href="https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md#prefer_explicit_this">查看原始规则</a></li>
+                    
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  <p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>
+                </article>
+                
+            </section>
+            
+    </main>
+  </body>
+</html>

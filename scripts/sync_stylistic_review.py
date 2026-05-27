@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import html
 import re
 import urllib.request
 from collections import Counter
@@ -15,6 +16,7 @@ SOURCE_RAW_URL = "https://raw.githubusercontent.com/saropa/saropa_lints/main/REA
 SOURCE_BLOB_URL = "https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md"
 OUTPUT_PAGE = Path("docs/team-guidelines/stylistic-review.mdx")
 OUTPUT_CSV = Path("docs/assets/stylistic-rule-review.csv")
+OUTPUT_HTML = Path("docs/assets/stylistic-review.html")
 
 CATEGORY_LABELS = {
     "General Stylistic Rules": "通用风格规则",
@@ -171,62 +173,6 @@ MEETING_BUCKET_ORDER = {
     "版本前提": 4,
 }
 
-BUCKET_STYLES = {
-    "二选一": {
-        "bg": "rgba(239, 68, 68, 0.14)",
-        "text": "#b91c1c",
-        "border": "rgba(185, 28, 28, 0.24)",
-    },
-    "低成本候选": {
-        "bg": "rgba(59, 130, 246, 0.14)",
-        "text": "#1d4ed8",
-        "border": "rgba(29, 78, 216, 0.24)",
-    },
-    "通用候选": {
-        "bg": "rgba(34, 197, 94, 0.14)",
-        "text": "#15803d",
-        "border": "rgba(21, 128, 61, 0.24)",
-    },
-    "项目/业务相关": {
-        "bg": "rgba(245, 158, 11, 0.18)",
-        "text": "#b45309",
-        "border": "rgba(180, 83, 9, 0.24)",
-    },
-    "版本前提": {
-        "bg": "rgba(20, 184, 166, 0.14)",
-        "text": "#0f766e",
-        "border": "rgba(15, 118, 110, 0.24)",
-    },
-}
-
-DECISION_STYLES = {
-    "待评审": {
-        "bg": "rgba(107, 114, 128, 0.14)",
-        "text": "#4b5563",
-        "border": "rgba(75, 85, 99, 0.22)",
-    },
-    "采纳": {
-        "bg": "rgba(34, 197, 94, 0.14)",
-        "text": "#15803d",
-        "border": "rgba(21, 128, 61, 0.24)",
-    },
-    "不采纳": {
-        "bg": "rgba(239, 68, 68, 0.14)",
-        "text": "#b91c1c",
-        "border": "rgba(185, 28, 28, 0.24)",
-    },
-    "试运行": {
-        "bg": "rgba(59, 130, 246, 0.14)",
-        "text": "#1d4ed8",
-        "border": "rgba(29, 78, 216, 0.24)",
-    },
-    "暂缓": {
-        "bg": "rgba(245, 158, 11, 0.18)",
-        "text": "#b45309",
-        "border": "rgba(180, 83, 9, 0.24)",
-    },
-}
-
 
 @dataclass(frozen=True)
 class RuleCandidate:
@@ -293,31 +239,46 @@ def discussion_suggestion(bucket: str) -> str:
     }[bucket]
 
 
-def build_badge(label: str, style: dict[str, str]) -> str:
-    return (
-        '<span style={{'
-        'display: "inline-block", '
-        'padding: "0.18rem 0.58rem", '
-        'marginRight: "0.45rem", '
-        'borderRadius: "999px", '
-        'border: "1px solid '
-        + style["border"]
-        + '", '
-        'background: "'
-        + style["bg"]
-        + '", '
-        'color: "'
-        + style["text"]
-        + '", '
-        'fontWeight: 800, '
-        'fontSize: "0.78em", '
-        'letterSpacing: "0.04em", '
-        'lineHeight: 1.2, '
-        'verticalAlign: "middle"'
-        '}}>'
-        + label
-        + "</span>"
+def category_specificity(category_label: str) -> tuple[int, int]:
+    return (category_label.count("/"), len(category_label))
+
+
+def merge_candidates(items: list[RuleCandidate]) -> RuleCandidate:
+    preferred_category = max(items, key=lambda item: category_specificity(item.category_label))
+    description = max((item.description for item in items), key=len)
+    quick_fix = any(item.quick_fix for item in items)
+    opposing_rule = next((item.opposing_rule for item in items if item.opposing_rule), "")
+    review_bucket = classify_rule(preferred_category.rule, opposing_rule, quick_fix)
+    bad_example = next((item.bad_example for item in items if item.bad_example), "")
+    good_example = next((item.good_example for item in items if item.good_example), "")
+
+    return RuleCandidate(
+        section=preferred_category.section,
+        subsection=preferred_category.subsection,
+        category_label=preferred_category.category_label,
+        rule=preferred_category.rule,
+        description=description,
+        gloss=preferred_category.gloss,
+        quick_fix=quick_fix,
+        opposing_rule=opposing_rule,
+        review_bucket=review_bucket,
+        discussion_suggestion=discussion_suggestion(review_bucket),
+        source_url=preferred_category.source_url,
+        bad_example=bad_example,
+        good_example=good_example,
     )
+
+
+def deduplicate_candidates(candidates: list[RuleCandidate]) -> list[RuleCandidate]:
+    grouped: dict[str, list[RuleCandidate]] = {}
+    order: list[str] = []
+    for candidate in candidates:
+        if candidate.rule not in grouped:
+            grouped[candidate.rule] = []
+            order.append(candidate.rule)
+        grouped[candidate.rule].append(candidate)
+
+    return [merge_candidates(grouped[rule]) for rule in order]
 
 
 def format_code_snippet(snippet: str) -> str:
@@ -326,17 +287,6 @@ def format_code_snippet(snippet: str) -> str:
     if len(collapsed) > 110:
         return collapsed[:107].rstrip() + "..."
     return collapsed
-
-
-def render_example_cell(bad_example: str, good_example: str) -> str:
-    if not bad_example and not good_example:
-        return "—"
-    parts = []
-    if bad_example:
-        parts.append(f"`BAD:` {format_code_snippet(bad_example)}")
-    if good_example:
-        parts.append(f"`GOOD:` {format_code_snippet(good_example)}")
-    return "<br />".join(parts)
 
 
 def parse_detailed_examples(content: str) -> dict[str, tuple[str, str]]:
@@ -440,7 +390,7 @@ def parse_candidates(content: str) -> list[RuleCandidate]:
 
         index += 1
 
-    return candidates
+    return deduplicate_candidates(candidates)
 
 
 def unique_opposing_pairs(candidates: list[RuleCandidate]) -> list[tuple[RuleCandidate, RuleCandidate]]:
@@ -469,30 +419,26 @@ def escape_pipes(text: str) -> str:
     return text.replace("|", r"\|")
 
 
-def render_pair_table(pairs: list[tuple[RuleCandidate, RuleCandidate]]) -> list[str]:
-    lines = [
-        "| 分类 | 方案 A | 方案 B | 中文释义 | 取舍点 | 示例 | 会议结论 | 备注 |\n",
-        "| --- | --- | --- | --- | --- | --- | --- | --- |\n",
-    ]
+def render_pair_list(pairs: list[tuple[RuleCandidate, RuleCandidate]]) -> list[str]:
+    lines: list[str] = []
     for left, right in pairs:
-        tradeoff = f"{left.description} / {right.description}"
-        example = render_example_cell(left.bad_example or right.bad_example, left.good_example or right.good_example)
-        lines.append(
-            "| "
-            + " | ".join(
-                [
-                    escape_pipes(left.category_label),
-                    f"[`{left.rule}`]({left.source_url})",
-                    f"[`{right.rule}`]({right.source_url})",
-                    escape_pipes(f"A：{left.gloss}<br />B：{right.gloss}"),
-                    escape_pipes(tradeoff),
-                    example,
-                    "待定",
-                    "",
-                ]
-            )
-            + " |\n"
+        lines.extend(
+            [
+                f"### `{left.rule}` vs `{right.rule}`\n\n",
+                f"- 分类：{left.category_label}\n",
+                f"- 方案 A：[`{left.rule}`]({left.source_url})\n",
+                f"- 方案 B：[`{right.rule}`]({right.source_url})\n",
+                f"- 中文释义：A 为“{left.gloss}” B 为“{right.gloss}”\n",
+                f"- 上游取舍点：{left.description} / {right.description}\n",
+                "- 会议结论：`待定`\n",
+                "- 备注：待填写\n\n",
+            ]
         )
+        if left.bad_example or left.good_example:
+            lines.append("**参考示例**\n\n")
+            lines.extend(render_example_blocks(left))
+        else:
+            lines.append("> 参考示例：上游文档未提供，讨论时可结合项目代码补充。\n\n")
     return lines
 
 
@@ -560,13 +506,11 @@ def render_candidate_sections(candidates: list[RuleCandidate]) -> list[str]:
                 item.rule,
             ),
         ):
-            bucket_badge = build_badge(candidate.review_bucket, BUCKET_STYLES[candidate.review_bucket])
-            pending_badge = build_badge("待评审", DECISION_STYLES["待评审"])
             lines.append(f"### `{candidate.rule}`\n\n")
-            lines.append(f"{bucket_badge}{pending_badge}\n\n")
             lines.append(f"- 中文释义：{candidate.gloss}\n")
             lines.append(f"- 上游说明：{candidate.description}\n")
-            lines.append(f"- 初筛分组：{candidate.review_bucket}\n")
+            lines.append("- 当前状态：`待评审`\n")
+            lines.append(f"- 初筛分组：`{candidate.review_bucket}`\n")
             lines.append(f"- 建议讨论方式：{candidate.discussion_suggestion}\n")
             lines.append(f"- 快速修复：{'是' if candidate.quick_fix else '否'}\n")
             if candidate.opposing_rule:
@@ -598,56 +542,332 @@ def render_page(candidates: list[RuleCandidate]) -> str:
     counts = bucket_counts(candidates)
     pairs = unique_opposing_pairs(candidates)
 
-    lines = [
-        "---\n",
-        "title: 团队规范：风格候选规则评审\n",
-        "description: 基于 saropa_lints 的候选风格规则评审表，用于团队会前预读与会议取舍。\n",
-        "prevpage:\n",
-        "  url: /team-guidelines/figma-dev-mode\n",
-        "  title: Figma 开发操作\n",
-        "---\n\n",
-        "<!-- 由 scripts/sync_stylistic_review.py 自动生成，请勿手工编辑规则表。 -->\n\n",
-        "# 团队规范：风格候选规则评审\n\n",
-        "这份评审表用于团队会议前后统一讨论 `saropa_lints` 的风格规则取舍。\n",
-        "规则名称与上游 lint id 保持一致，便于直接映射到 `analysis_options.yaml`。\n\n",
-        f"上游来源：[saropa_lints / README_STYLISTIC.md]({SOURCE_BLOB_URL})\n\n",
-        f"配套 CSV：[下载候选规则评审表](/assets/stylistic-rule-review.csv)\n\n",
-        f"最近一次同步日期：`{generated_at}`\n\n",
-        "## 使用建议\n\n",
-        "1. 会前先顺着本页逐条预读，在每条规则的 `评审记录模板` 里记录自己的倾向。\n",
-        "2. 会议中优先讨论下面的“二选一冲突规则”，这些规则必须成对取舍。\n",
-        "3. 对 `低成本候选` 可以优先试运行，再决定是否升级为团队正式规范。\n",
-        "4. 对 `项目/业务相关` 或 `版本前提` 的规则，先确认适用范围，再决定是否纳入团队规范。\n\n",
-        "> 说明\n",
-        ">\n",
-        "> 这份页面已经改成“逐条评审版”。主体部分不再依赖大表格，而是每条规则一个小节，方便在 `docs.page` 中一条条讨论、复制、记录会议结论。\n"
-        "> `中文释义` 便于会前快速理解规则意图；`示例` 会优先复用上游 README 中已经提供的 BAD / GOOD 对照。\n"
-        "> 没有示例的规则暂时留空，避免生成误导性的伪示例。\n\n",
-        "## 初筛统计\n\n",
-        f"- 总候选规则：`{len(candidates)}`\n",
-        f"- 二选一规则：`{counts['二选一']}` 条，对应 `{len(pairs)}` 组冲突项\n",
-        f"- 低成本候选：`{counts['低成本候选']}` 条\n",
-        f"- 通用候选：`{counts['通用候选']}` 条\n",
-        f"- 项目/业务相关：`{counts['项目/业务相关']}` 条\n",
-        f"- 版本前提：`{counts['版本前提']}` 条\n\n",
-        "## 初筛分组说明\n\n",
-        "- `二选一`：存在明确对立规则，需要在会议里成对决策。\n",
-        "- `低成本候选`：可自动修复或迁移成本较低，适合先试运行。\n",
-        "- `通用候选`：没有明显对立项，也不强依赖具体业务，适合先异步预投票。\n",
-        "- `项目/业务相关`：更像团队或业务约束，不建议脱离项目上下文直接采纳。\n",
-        "- `版本前提`：依赖 Flutter 或 SDK 版本，需要先确认技术前提。\n\n",
-        "## 快速导航\n\n",
-    ]
-    lines.extend(render_quick_index(candidates))
-    lines.extend(
+    return "".join(
         [
-        "## 二选一冲突规则\n\n",
+            "---\n",
+            "title: 团队规范：风格候选规则评审\n",
+            "description: 使用独立 HTML 页面进行逐条评审，评审完成后再沉淀为正式团队规范。\n",
+            "prevpage:\n",
+            "  url: /team-guidelines/figma-dev-mode\n",
+            "  title: Figma 开发操作\n",
+            "---\n\n",
+            "<!-- 由 scripts/sync_stylistic_review.py 自动生成。 -->\n\n",
+            "# 团队规范：风格候选规则评审\n\n",
+            "这部分改为使用独立 HTML 页面进行逐条评审，避免 `docs.page` 的 MDX bundling 对复杂评审结构产生限制。\n\n",
+            f"- 打开 HTML 评审页：[风格候选规则评审 HTML](/assets/stylistic-review.html)\n",
+            f"- 下载 CSV：[stylistic-rule-review.csv](/assets/stylistic-rule-review.csv)\n",
+            f"- 上游来源：[saropa_lints / README_STYLISTIC.md]({SOURCE_BLOB_URL})\n",
+            f"- 最近一次同步日期：`{generated_at}`\n\n",
+            "## 当前统计\n\n",
+            f"- 总候选规则：`{len(candidates)}`\n",
+            f"- 二选一规则：`{counts['二选一']}` 条，对应 `{len(pairs)}` 组冲突项\n",
+            f"- 低成本候选：`{counts['低成本候选']}` 条\n",
+            f"- 通用候选：`{counts['通用候选']}` 条\n",
+            f"- 项目/业务相关：`{counts['项目/业务相关']}` 条\n",
+            f"- 版本前提：`{counts['版本前提']}` 条\n\n",
+            "## 评审建议\n\n",
+            "1. 会前在 HTML 页面里逐条记录 `采纳 / 不采纳 / 试运行 / 暂缓` 倾向。\n",
+            "2. 会议中优先讨论 `二选一` 冲突规则和高争议规则。\n",
+            "3. 评审结束后，再把最终结论整理回正式的 `docs.page` 规范页。\n",
         ]
     )
-    lines.extend(render_pair_table(pairs))
-    lines.append("\n")
-    lines.extend(render_candidate_sections(candidates))
-    return "".join(lines)
+
+
+def render_html_review(candidates: list[RuleCandidate]) -> str:
+    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    counts = bucket_counts(candidates)
+    pairs = unique_opposing_pairs(candidates)
+    grouped: dict[str, list[RuleCandidate]] = {}
+    order: list[str] = []
+    for candidate in candidates:
+        if candidate.category_label not in grouped:
+            grouped[candidate.category_label] = []
+            order.append(candidate.category_label)
+        grouped[candidate.category_label].append(candidate)
+
+    nav_items = []
+    for category in order:
+        nav_items.append(f'<li><a href="#{html.escape(category)}">{html.escape(category)}</a></li>')
+
+    pair_blocks: list[str] = []
+    for left, right in pairs:
+        example_html = ""
+        if left.bad_example or left.good_example:
+            blocks = []
+            if left.bad_example:
+                blocks.append(
+                    "<div class='example-block'><div class='example-title'>BAD</div><pre><code>"
+                    + html.escape(left.bad_example.rstrip())
+                    + "</code></pre></div>"
+                )
+            if left.good_example:
+                blocks.append(
+                    "<div class='example-block'><div class='example-title'>GOOD</div><pre><code>"
+                    + html.escape(left.good_example.rstrip())
+                    + "</code></pre></div>"
+                )
+            example_html = "<div class='examples'>" + "".join(blocks) + "</div>"
+        else:
+            example_html = "<p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>"
+
+        pair_blocks.append(
+            f"""
+            <section class="pair-card">
+              <h3>{html.escape(left.rule)} vs {html.escape(right.rule)}</h3>
+              <ul>
+                <li><strong>分类：</strong>{html.escape(left.category_label)}</li>
+                <li><strong>方案 A：</strong><a href="{html.escape(left.source_url)}">{html.escape(left.rule)}</a></li>
+                <li><strong>方案 B：</strong><a href="{html.escape(right.source_url)}">{html.escape(right.rule)}</a></li>
+                <li><strong>中文释义：</strong>A 为“{html.escape(left.gloss)}” B 为“{html.escape(right.gloss)}”</li>
+                <li><strong>上游取舍点：</strong>{html.escape(left.description)} / {html.escape(right.description)}</li>
+                <li><strong>会议结论：</strong><span class="decision">待定</span></li>
+                <li><strong>备注：</strong>待填写</li>
+              </ul>
+              {example_html}
+            </section>
+            """
+        )
+
+    category_blocks: list[str] = []
+    for category in order:
+        cards: list[str] = []
+        category_rules = sorted(grouped[category], key=lambda item: (MEETING_BUCKET_ORDER[item.review_bucket], item.rule))
+        for candidate in category_rules:
+            if candidate.bad_example or candidate.good_example:
+                example_parts = []
+                if candidate.bad_example:
+                    example_parts.append(
+                        "<div class='example-block'><div class='example-title'>BAD</div><pre><code>"
+                        + html.escape(candidate.bad_example.rstrip())
+                        + "</code></pre></div>"
+                    )
+                if candidate.good_example:
+                    example_parts.append(
+                        "<div class='example-block'><div class='example-title'>GOOD</div><pre><code>"
+                        + html.escape(candidate.good_example.rstrip())
+                        + "</code></pre></div>"
+                    )
+                example_html = "<div class='examples'>" + "".join(example_parts) + "</div>"
+            else:
+                example_html = "<p class='muted'>上游文档未提供示例，建议会议中结合项目代码补充。</p>"
+
+            opposing_html = (
+                f"<li><strong>对立规则：</strong><a href='#{html.escape(candidate.opposing_rule)}'>{html.escape(candidate.opposing_rule)}</a></li>"
+                if candidate.opposing_rule
+                else ""
+            )
+            cards.append(
+                f"""
+                <article class="rule-card" id="{html.escape(candidate.rule)}">
+                  <div class="card-head">
+                    <h3>{html.escape(candidate.rule)}</h3>
+                    <div class="meta">
+                      <span class="bucket bucket-{html.escape(candidate.review_bucket)}">{html.escape(candidate.review_bucket)}</span>
+                      <span class="decision">待评审</span>
+                    </div>
+                  </div>
+                  <ul>
+                    <li><strong>中文释义：</strong>{html.escape(candidate.gloss)}</li>
+                    <li><strong>上游说明：</strong>{html.escape(candidate.description)}</li>
+                    <li><strong>快速修复：</strong>{'是' if candidate.quick_fix else '否'}</li>
+                    <li><strong>建议讨论方式：</strong>{html.escape(candidate.discussion_suggestion)}</li>
+                    <li><strong>上游链接：</strong><a href="{html.escape(candidate.source_url)}">查看原始规则</a></li>
+                    {opposing_html}
+                  </ul>
+                  <div class="decision-block">
+                    <div><strong>评审记录模板</strong></div>
+                    <ul>
+                      <li>当前结论：待评审</li>
+                      <li>会议决定：采纳 / 不采纳 / 试运行 / 暂缓</li>
+                      <li>结论理由：待填写</li>
+                      <li>负责人：待填写</li>
+                      <li>后续动作：待填写</li>
+                    </ul>
+                  </div>
+                  {example_html}
+                </article>
+                """
+            )
+
+        category_blocks.append(
+            f"""
+            <section class="category" id="{html.escape(category)}">
+              <h2>{html.escape(category)}</h2>
+              <p class="muted">本分类共 {len(category_rules)} 条规则，建议按“二选一 -> 低成本候选 -> 其他”的顺序讨论。</p>
+              {''.join(cards)}
+            </section>
+            """
+        )
+
+    return f"""<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>团队规范：风格候选规则评审</title>
+    <style>
+      :root {{
+        --bg: #f4f1ea;
+        --panel: #fffdf8;
+        --ink: #1f2937;
+        --muted: #6b7280;
+        --line: #e5ddd0;
+        --accent: #1d4ed8;
+        --good: #15803d;
+        --warn: #b45309;
+        --bad: #b91c1c;
+      }}
+      * {{ box-sizing: border-box; }}
+      body {{
+        margin: 0;
+        font-family: "PingFang SC", "Noto Sans SC", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(29, 78, 216, 0.08), transparent 28%),
+          linear-gradient(180deg, #f7f3eb 0%, #f2eee6 100%);
+      }}
+      a {{ color: var(--accent); text-decoration: none; }}
+      a:hover {{ text-decoration: underline; }}
+      .page {{
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 32px 20px 80px;
+      }}
+      .hero, .summary, .nav, .pairs, .category {{
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: 0 18px 50px rgba(31, 41, 55, 0.06);
+        padding: 24px;
+        margin-bottom: 20px;
+      }}
+      .hero h1 {{ margin: 0 0 12px; font-size: 32px; }}
+      .hero p, .muted {{ color: var(--muted); }}
+      .summary-grid {{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+      }}
+      .summary-item {{
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 14px 16px;
+        background: #fffaf2;
+      }}
+      .summary-item strong {{
+        display: block;
+        font-size: 24px;
+        margin-top: 8px;
+      }}
+      .nav ul {{ margin: 0; padding-left: 18px; columns: 2; }}
+      .nav li {{ margin: 6px 0; }}
+      .pair-card, .rule-card {{
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+        background: #fffefb;
+        margin-top: 16px;
+      }}
+      .card-head {{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }}
+      .card-head h3, .pair-card h3 {{ margin: 0; }}
+      .meta {{ display: flex; gap: 8px; flex-wrap: wrap; }}
+      .bucket, .decision {{
+        display: inline-block;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 700;
+      }}
+      .bucket-二选一 {{ background: rgba(239, 68, 68, 0.12); color: var(--bad); }}
+      .bucket-低成本候选 {{ background: rgba(59, 130, 246, 0.12); color: var(--accent); }}
+      .bucket-通用候选 {{ background: rgba(34, 197, 94, 0.12); color: var(--good); }}
+      .bucket-项目\/业务相关 {{ background: rgba(245, 158, 11, 0.14); color: var(--warn); }}
+      .bucket-版本前提 {{ background: rgba(20, 184, 166, 0.12); color: #0f766e; }}
+      .decision {{ background: rgba(107, 114, 128, 0.14); color: #4b5563; }}
+      ul {{ margin: 12px 0 0; padding-left: 18px; }}
+      li {{ margin: 6px 0; }}
+      .decision-block {{
+        margin-top: 14px;
+        border-top: 1px dashed var(--line);
+        padding-top: 14px;
+      }}
+      .examples {{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }}
+      .example-block {{
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #faf6ef;
+        overflow: hidden;
+      }}
+      .example-title {{
+        padding: 10px 14px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid var(--line);
+        background: #fff8ec;
+      }}
+      pre {{
+        margin: 0;
+        padding: 14px;
+        overflow: auto;
+        font-size: 13px;
+        line-height: 1.55;
+      }}
+      code {{ font-family: "SFMono-Regular", "JetBrains Mono", monospace; }}
+      @media (max-width: 720px) {{
+        .nav ul {{ columns: 1; }}
+        .page {{ padding: 20px 14px 60px; }}
+      }}
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <h1>团队规范：风格候选规则评审</h1>
+        <p>这份 HTML 页面用于团队会前预读和会议逐条评审，规则名称与上游 lint id 保持一致，评审结束后再整理为正式的 docs.page 规范页面。</p>
+        <p>
+          <a href="{html.escape(SOURCE_BLOB_URL)}">查看上游 README</a>
+          · <a href="/assets/stylistic-rule-review.csv">下载 CSV</a>
+          · 最近同步：{generated_at}
+        </p>
+      </section>
+      <section class="summary">
+        <h2>初筛统计</h2>
+        <div class="summary-grid">
+          <div class="summary-item">总候选规则<strong>{len(candidates)}</strong></div>
+          <div class="summary-item">二选一规则<strong>{counts['二选一']}</strong></div>
+          <div class="summary-item">冲突组数<strong>{len(pairs)}</strong></div>
+          <div class="summary-item">低成本候选<strong>{counts['低成本候选']}</strong></div>
+          <div class="summary-item">通用候选<strong>{counts['通用候选']}</strong></div>
+          <div class="summary-item">项目/业务相关<strong>{counts['项目/业务相关']}</strong></div>
+          <div class="summary-item">版本前提<strong>{counts['版本前提']}</strong></div>
+        </div>
+      </section>
+      <section class="nav">
+        <h2>快速导航</h2>
+        <ul>{''.join(nav_items)}</ul>
+      </section>
+      <section class="pairs">
+        <h2>二选一冲突规则</h2>
+        <p class="muted">会议中优先讨论这些必须成对取舍的规则。</p>
+        {''.join(pair_blocks)}
+      </section>
+      {''.join(category_blocks)}
+    </main>
+  </body>
+</html>
+"""
 
 
 def write_csv(candidates: list[RuleCandidate]) -> None:
@@ -703,6 +923,7 @@ def write_csv(candidates: list[RuleCandidate]) -> None:
 def write_outputs(candidates: list[RuleCandidate]) -> None:
     OUTPUT_PAGE.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PAGE.write_text(render_page(candidates), encoding="utf-8")
+    OUTPUT_HTML.write_text(render_html_review(candidates), encoding="utf-8")
     write_csv(candidates)
 
 
